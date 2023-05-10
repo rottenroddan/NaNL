@@ -1,0 +1,9 @@
+cmake-build-debug/
+cmake-build-release/
+.idea/
+src/cmake-build-debug/
+src/cmake-build-release/
+performance-testing/cmake-build-debug/
+performance-testing/cmake-build-release/
+tests/lib/
+tests/data/
