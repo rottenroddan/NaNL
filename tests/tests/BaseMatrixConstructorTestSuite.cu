@@ -9,7 +9,7 @@ TEST(BaseMatrixConstructorTestSuite,  Should_Construct_Matrix_And_Store_Correct_
     NaNL::Matrix<long, NaNL::Device::Host> a(10, 20);
     NaNL::Matrix<long, NaNL::Device::Cuda> b(10, 20);
 
-    // Host
+    // PagedUnalligned
     ASSERT_EQ(a.getCols(), 20);
     ASSERT_EQ(a.getRows(), 10);
     ASSERT_EQ(a.getTotalSize(), 200);

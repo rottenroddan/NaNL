@@ -7,6 +7,7 @@
 #include "BaseMatrix.cuh"
 #include "../Kernels/MatrixKernels.cuh"
 #include "../ThreadPool/ThreadPool.cuh"
+#include "CudaUtil/CudaUtil.cuh"
 #include <utility>
 #include <mma.h>
 

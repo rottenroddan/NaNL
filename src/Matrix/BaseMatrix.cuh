@@ -10,6 +10,7 @@
 #endif
 
 #include "../Logger/Logger.cuh"
+#include "MemoryBlock/Deleters.cu"
 
 #include <cuda_runtime.h>
 //#include <cuda_device_runtime_api.h>
@@ -24,24 +25,6 @@
 
 
 namespace NaNL {
-    /**
-     * Function that frees paged memory from the pointer provided.
-     * @tparam T Pointer type.
-     * @param ptr_ Pointer to the address to free.
-     */
-    template<typename T>
-    inline void _freePagedMemory(T* ptr_);
-
-    /**
-     * Function that frees pinned memory from the pointer provided.
-     * Calls <code>cudaFreeHost</code> to free pinned memory.
-     * @tparam T Pointer type.
-     * @param ptr_ Pointer to the address to free.
-     */
-    template<typename T>
-    inline void _freePinnedMemory(T* ptr_);
-
-
     // memory types for
     class Device {
     protected:

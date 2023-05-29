@@ -11,9 +11,6 @@
 
 
 namespace NaNL {
-    inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true);
-    #define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
-
     template<typename T>
     __global__ void deviceAddMatrices(T *_dev_a, T *_dev_b, T *_dev_c, unsigned long mSize);
 }

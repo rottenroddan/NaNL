@@ -20,4 +20,4 @@ set_target_properties(Matrix PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 # set(SOURCE_FILES Matrix_Impl/BaseMatrix.cu Matrix_Impl/Matrix.cu Matrix_Impl/MatrixFileLoader.cu)
 set_property(TARGET Matrix PROPERTY CUDA_ARCHITECTURES 80)
 
-target_include_directories(Matrix PUBLIC Kernels Matrix Logger ThreadPool)
+target_include_directories(Matrix PUBLIC Matrix/Kernels Matrix Matrix/Logger Matrix/MemoryBlock ThreadPool)

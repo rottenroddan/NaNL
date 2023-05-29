@@ -21,7 +21,7 @@ TEST(BaseMatrixTestSuite, Should_Be_Able_To_Access_Matrix_When_Index_Is_Within_B
     }
 
     for(unsigned int i = 0; i < a.getRows(); i++) {
-        // check every i,0th index is 100. Host/Cuda
+        // check every i,0th index is 100. PagedUnalligned/Cuda
         ASSERT_EQ(a[i][0], 100);
         ASSERT_EQ(a.get(i, 0), 100);
         ASSERT_EQ(b[i][0], 100);
@@ -37,7 +37,7 @@ TEST(BaseMatrixTestSuite, Should_Be_Able_To_Access_Matrix_When_Index_Is_Within_B
 }
 
 TEST(BaseMatrixTestSuite, Should_Return_True_When_Both_Matrices_Are_Exact_Same_Shape) {
-    // Host
+    // PagedUnalligned
     NaNL::Matrix<int, NaNL::Device::Host> host_A(66, 23);
     NaNL::Matrix<int, NaNL::Device::Host> host_B(66, 23);
 

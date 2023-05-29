@@ -31,7 +31,7 @@ void host() {
     x.add(y);
     auto hostTimerEnd = Clock::now();
 
-    std::cout << "Host add time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(hostTimerEnd - hostTimerStart).count() << " nanoseconds." << std::endl;
+    std::cout << "PagedUnalligned add time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(hostTimerEnd - hostTimerStart).count() << " nanoseconds." << std::endl;
 
 }
 
