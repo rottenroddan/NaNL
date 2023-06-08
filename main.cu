@@ -1,9 +1,7 @@
 #include <chrono>
 #include <iostream>
 #include <Matrix.cuh>
-#include <MatrixFileLoader.cuh>
-
-#include "test.cu"
+#include "MatrixFileLoader/MatrixFileLoader.cuh"
 
 /*
 template <typename T>
@@ -21,32 +19,32 @@ void testShit() {
 
 #define ADD_SIZE 20000
 
-void host() {
-    typedef std::chrono::high_resolution_clock Clock;
-
-    NaNL::Matrix<unsigned long long, NaNL::Device::Host> x(ADD_SIZE,ADD_SIZE);
-    NaNL::Matrix<unsigned long long, NaNL::Device::Host> y(ADD_SIZE,ADD_SIZE);
-
-    auto hostTimerStart = Clock::now();
-    x.add(y);
-    auto hostTimerEnd = Clock::now();
-
-    std::cout << "PagedUnalligned add time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(hostTimerEnd - hostTimerStart).count() << " nanoseconds." << std::endl;
-
-}
-
-void cuda() {
-    typedef std::chrono::high_resolution_clock Clock;
-
-    NaNL::Matrix<unsigned long long, NaNL::Device::Cuda> xx(ADD_SIZE,ADD_SIZE);
-    NaNL::Matrix<unsigned long long, NaNL::Device::Cuda> yy(ADD_SIZE,ADD_SIZE);
-
-    auto cudaTimerStart = Clock::now();
-    xx.add(yy);
-    auto cudaTimerEnd = Clock::now();
-
-    std::cout << "Cuda add time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(cudaTimerEnd - cudaTimerStart).count() << " nanoseconds." << std::endl;
-}
+//void host() {
+//    typedef std::chrono::high_resolution_clock Clock;
+//
+//    NaNL::Matrix<unsigned long long, NaNL::Device::Host> x(ADD_SIZE,ADD_SIZE);
+//    NaNL::Matrix<unsigned long long, NaNL::Device::Host> y(ADD_SIZE,ADD_SIZE);
+//
+//    auto hostTimerStart = Clock::now();
+//    x.add(y);
+//    auto hostTimerEnd = Clock::now();
+//
+//    std::cout << "PagedUnalligned add time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(hostTimerEnd - hostTimerStart).count() << " nanoseconds." << std::endl;
+//
+//}
+//
+//void cuda() {
+//    typedef std::chrono::high_resolution_clock Clock;
+//
+//    NaNL::Matrix<unsigned long long, NaNL::Device::Cuda> xx(ADD_SIZE,ADD_SIZE);
+//    NaNL::Matrix<unsigned long long, NaNL::Device::Cuda> yy(ADD_SIZE,ADD_SIZE);
+//
+//    auto cudaTimerStart = Clock::now();
+//    xx.add(yy);
+//    auto cudaTimerEnd = Clock::now();
+//
+//    std::cout << "Cuda add time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(cudaTimerEnd - cudaTimerStart).count() << " nanoseconds." << std::endl;
+//}
 
 int main() {
 

@@ -23,8 +23,9 @@ MatrixFileLoader::MatrixFileLoader(const std::string& file)  {
     ss >> this->totalMatrices;
 }
 
-template<typename T, typename U>
-NaNL::Matrix<T, U> MatrixFileLoader::readValuesIntoMatrix() {
+template<class T, template<typename> class Memory,
+        template<class, template<typename> class> class Alignment>
+NaNL::Matrix<T, Memory, Alignment> MatrixFileLoader::readValuesIntoMatrix() {
     // get first line from file.
     std::string line;
     std::getline(this->file, line);
@@ -35,7 +36,7 @@ NaNL::Matrix<T, U> MatrixFileLoader::readValuesIntoMatrix() {
     ss >> rows;
     ss >> cols;
 
-    NaNL::Matrix<T, U> matrixFromFile(rows, cols);
+    NaNL::Matrix<T, Memory, Alignment> matrixFromFile(rows, cols);
 
     // for each number of rows, get line to populate matrix per row.
     for(unsigned long i = 0; i < rows; i++) {

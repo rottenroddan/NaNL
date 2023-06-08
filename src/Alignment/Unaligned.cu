@@ -7,7 +7,6 @@
 namespace NaNL {
     template<class T, template<typename> class Memory>
     Unaligned<T, Memory>::Unaligned(uint64_t rows, uint64_t cols) : BaseAlignment<T, Memory>(rows, cols) {
-        std::cout << rows << " : " << cols << std::endl;
 
         this->rows = rows;
         this->cols = cols;
@@ -18,32 +17,32 @@ namespace NaNL {
     }
 
     template<class T, template<typename> class Memory>
-    uint64_t Unaligned<T, Memory>::Unaligned::getRows() {
+    uint64_t Unaligned<T, Memory>::Unaligned::getRows() const {
         return this->rows;
     }
 
     template<class T, template<typename> class Memory>
-    uint64_t Unaligned<T, Memory>::Unaligned::getActualRows() {
+    uint64_t Unaligned<T, Memory>::Unaligned::getActualRows() const {
         return this->actualRows;
     }
 
     template<class T, template<typename> class Memory>
-    uint64_t Unaligned<T, Memory>::Unaligned::getCols() {
+    uint64_t Unaligned<T, Memory>::Unaligned::getCols() const {
         return this->cols;
     }
 
     template<class T, template<typename> class Memory>
-    uint64_t Unaligned<T, Memory>::Unaligned::getActualCols() {
+    uint64_t Unaligned<T, Memory>::Unaligned::getActualCols() const {
         return this->actualCols;
     }
 
     template<class T, template<typename> class Memory>
-    uint64_t Unaligned<T, Memory>::Unaligned::getTotalSize() {
+    uint64_t Unaligned<T, Memory>::Unaligned::getTotalSize() const {
         return this->totalSize;
     }
 
     template<class T, template<typename> class Memory>
-    uint64_t Unaligned<T, Memory>::Unaligned::getActualTotalSize() {
+    uint64_t Unaligned<T, Memory>::Unaligned::getActualTotalSize() const {
         return this->actualTotalSize;
     }
 } // NaNL

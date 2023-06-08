@@ -6,7 +6,7 @@
 #ifndef NANL_MATRIXFILELOADER_CUH
 #define NANL_MATRIXFILELOADER_CUH
 
-#include "BaseMatrix.cuh"
+#include "../../BaseMatrix/BaseMatrix.cuh"
 #include "Matrix.cuh"
 
 #include <deque>
@@ -25,8 +25,9 @@ public:
     inline unsigned long getTotalMatrices();
     inline unsigned long getCurrentMatrix();
 
-    template<typename T, typename U>
-    inline NaNL::Matrix<T, U> readValuesIntoMatrix();
+    template<class T, template<typename> class Memory = NaNL::PagedMemoryBlock,
+            template<class, template<typename> class> class Alignment = NaNL::Unaligned>
+    inline NaNL::Matrix<T, Memory, Alignment> readValuesIntoMatrix();
 
     inline ~MatrixFileLoader();
 };

@@ -11,13 +11,13 @@ namespace NaNL {
     template<class T, template<typename> class Memory>
     class Unaligned : protected BaseAlignment<T,Memory>{
     public:
-        Unaligned(uint64_t rows, uint64_t cols);
-        inline uint64_t getRows();
-        inline uint64_t getActualRows();
-        inline uint64_t getCols();
-        inline uint64_t getActualCols();
-        inline uint64_t getTotalSize();
-        inline uint64_t getActualTotalSize();
+        inline Unaligned(uint64_t rows, uint64_t cols);
+        inline uint64_t getRows() const;
+        inline uint64_t getActualRows() const;
+        inline uint64_t getCols() const;
+        inline uint64_t getActualCols() const;
+        inline uint64_t getTotalSize() const;
+        inline uint64_t getActualTotalSize() const;
     };
 
 } // NaNL

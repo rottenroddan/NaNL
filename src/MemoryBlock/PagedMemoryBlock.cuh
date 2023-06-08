@@ -7,7 +7,7 @@
 
 namespace NaNL {
 
-    template<typename T>
+    template<class T>
     class PagedMemoryBlock {
     protected:
         std::unique_ptr<T[], void(*)(T*)> _matrix;
