@@ -8,12 +8,7 @@ namespace NaNL {
     template<class T, template<typename> class Memory>
     Unaligned<T, Memory>::Unaligned(uint64_t rows, uint64_t cols) : BaseAlignment<T, Memory>(rows, cols) {
 
-        this->rows = rows;
-        this->cols = cols;
-        this->totalSize = rows * cols;
-        this->actualRows = rows;
-        this->actualCols = cols;
-        this->actualTotalSize = this->totalSize;
+        align(rows, cols);
     }
 
     template<class T, template<typename> class Memory>
@@ -44,5 +39,15 @@ namespace NaNL {
     template<class T, template<typename> class Memory>
     uint64_t Unaligned<T, Memory>::Unaligned::getActualTotalSize() const {
         return this->actualTotalSize;
+    }
+
+    template<class T, template<typename> class Memory>
+    void Unaligned<T, Memory>::align(uint64_t rows, uint64_t cols) {
+        this->rows = rows;
+        this->cols = cols;
+        this->totalSize = rows * cols;
+        this->actualRows = rows;
+        this->actualCols = cols;
+        this->actualTotalSize = this->totalSize;
     }
 } // NaNL

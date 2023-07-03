@@ -1,0 +1,27 @@
+//
+// Created by steve on 6/10/2023.
+//
+
+#ifndef NANL_DEVICEMEMORYBLOCK_CUH
+#define NANL_DEVICEMEMORYBLOCK_CUH
+
+#include "../CudaUtil/CudaUtil.cuh"
+#include "BaseMemoryBlock.cuh"
+#include "Deleters.cu"
+
+#include <cuda.h>
+#include <cuda_runtime.h>
+
+namespace NaNL {
+
+    template<class T>
+    class DeviceMemoryBlock : public Internal::BaseMemoryBlock<T> {
+    protected:
+        inline explicit DeviceMemoryBlock(uint64_t totalSize);
+    };
+
+} // NaNL
+
+#include "DeviceMemoryBlock.cu"
+
+#endif //NANL_DEVICEMEMORYBLOCK_CUH

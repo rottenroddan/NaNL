@@ -35,6 +35,18 @@ namespace NaNL {
 
     template<class T, template<typename> class Memory,
             template<class, template<typename > class >class Alignment>
+    BaseMatrix<T, Memory, Alignment>&
+            BaseMatrix<T, Memory, Alignment>::operator=(BaseMatrix<T, Memory, Alignment> &&moveMatrix) noexcept {
+
+        this->align(moveMatrix.getRows(), moveMatrix.getCols());
+        moveMatrix.align(0,0);
+        this->_matrix = std::move(moveMatrix._matrix);
+
+        return *this;
+    }
+
+    template<class T, template<typename> class Memory,
+            template<class, template<typename > class >class Alignment>
     bool BaseMatrix<T, Memory, Alignment>::validateMatricesAreSameShape(const BaseMatrix<T, Memory, Alignment> &b) const {
         if (this->rows == b.rows && this->cols == b.cols)
             return true;

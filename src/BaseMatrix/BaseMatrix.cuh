@@ -95,6 +95,12 @@ namespace NaNL {
         inline T get(uint64_t i, uint64_t j) const;
 
         /**
+         *
+         * @param moveMatrix
+         */
+        inline BaseMatrix<T, Memory, Alignment>& operator=(BaseMatrix<T, Memory, Alignment> &&moveMatrix) noexcept;
+
+        /**
          * Compares this matrix to the referenced BaseMatrix. If both rows and
          * columns match up, then returns true. Else false.
          * @param b Reference to other matrix to check if shape is the same.
@@ -103,6 +109,7 @@ namespace NaNL {
         inline bool validateMatricesAreSameShape(const BaseMatrix<T, Memory, Alignment> &b) const;
 
         //BaseMatrix<T>& operator=(const BaseMatrix<T> &rhs);
+
 
         //virtual void subtract() = 0;
         //virtual void dot() = 0;

@@ -11,6 +11,7 @@
 #include <utility>
 #include <mma.h>
 
+
 namespace NaNL {
 
     enum class MatrixDeviceOperation { Host, Cuda, TensorCores };
@@ -27,15 +28,23 @@ namespace NaNL {
     protected:
         friend class MatrixUtility;
     public:
+        inline Matrix();
         inline Matrix(uint64_t rows, uint64_t cols);
         inline Matrix(const Matrix<T, Memory, Alignment> &copyMatrix) noexcept;
         inline Matrix(Matrix<T, Memory, Alignment> &&copyMatrix) noexcept;
         inline Matrix<T, Memory, Alignment> &operator=(const Matrix<T, Memory, Alignment> &rhs);
+        inline Matrix<T, Memory, Alignment> &operator=(Matrix<T, Memory, Alignment> &&rhs)  noexcept = default;
 
         template<template<typename> class rMemory, template<class, template<typename> class> class rAlignment>
-        inline Matrix<T, rMemory, rAlignment> add(const Matrix<T, PagedMemoryBlock, Unaligned> &b, MatrixDeviceOperation device = MatrixDeviceOperation::Host);
+        inline Matrix<T, rMemory, rAlignment> copyTo() const;
         template<template<typename> class rMemory, template<class, template<typename> class> class rAlignment>
-        inline Matrix<T, rMemory, rAlignment> add(const Matrix<T, PinnedMemoryBlock, Unaligned> &b, MatrixDeviceOperation device = MatrixDeviceOperation::Host);
+        inline Matrix<T, rMemory, rAlignment> moveTo() const;
+
+        template<template<typename> class rMemory, template<class, template<typename> class> class rAlignment,
+                template<typename> class uMemory, template<class, template<typename> class> class uAlignment>
+        inline Matrix<T, rMemory, rAlignment> add(const Matrix<T, uMemory, uAlignment> &b, MatrixDeviceOperation device = MatrixDeviceOperation::Host);
+//        template<template<typename> class rMemory, template<class, template<typename> class> class rAlignment>
+//        inline Matrix<T, rMemory, rAlignment> add(const Matrix<T, PinnedMemoryBlock, Unaligned> &b, MatrixDeviceOperation device = MatrixDeviceOperation::Host);
 
     };
 

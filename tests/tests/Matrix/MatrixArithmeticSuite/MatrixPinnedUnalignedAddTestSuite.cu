@@ -3,7 +3,7 @@
 //
 
 #include "gtest/gtest.h"
-#include <Matrix.cuh>
+#include "Matrix.cuh"
 #include "MatrixFileLoader/MatrixFileLoader.cuh"
 
 //TEST(MatrixAddSubtractTestSuite, Should_Add_Small_Matrices_To_Correct_Values_When_Host) {

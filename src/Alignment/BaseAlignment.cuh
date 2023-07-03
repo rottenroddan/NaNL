@@ -7,7 +7,7 @@
 
 namespace NaNL {
     template<class T, template<typename> class Memory>
-    class BaseAlignment : protected Memory<T> {
+    class BaseAlignment : public Memory<T> {
     protected:
         inline BaseAlignment(uint64_t rows, uint64_t cols);
 
@@ -26,6 +26,8 @@ namespace NaNL {
         virtual inline uint64_t getTotalSize() const = 0;
 
         virtual inline uint64_t getActualTotalSize() const = 0;
+
+        virtual inline void align(uint64_t rows, uint64_t cols) = 0;
     };
 }
 

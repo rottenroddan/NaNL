@@ -6,14 +6,13 @@
 #define NANL_PINNEDMEMORYBLOCK_CUH
 
 #include "../CudaUtil/CudaUtil.cuh"
+#include "Deleters.cu"
 
 namespace NaNL {
 
     template<class T>
-    class PinnedMemoryBlock {
+    class PinnedMemoryBlock : public NaNL::Internal::BaseMemoryBlock<T> {
     protected:
-        std::unique_ptr<T[], void(*)(T*)> _matrix;
-
         inline explicit PinnedMemoryBlock(uint64_t totalSize);
     };
 

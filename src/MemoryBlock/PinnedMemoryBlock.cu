@@ -6,7 +6,8 @@
 
 namespace NaNL {
     template<class T>
-    NaNL::PinnedMemoryBlock<T>::PinnedMemoryBlock(uint64_t totalSize) : _matrix(nullptr, nullptr)
+    PinnedMemoryBlock<T>::PinnedMemoryBlock(uint64_t totalSize) :
+    Internal::BaseMemoryBlock<T>(Internal::MemoryTypes::CudaPinned)
     {
         T *_pinnedArr;
         gpuErrchk(cudaMallocHost((void **) &_pinnedArr, totalSize * sizeof(T)));

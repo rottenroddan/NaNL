@@ -5,13 +5,14 @@
 #ifndef NANL_PAGEDMEMORYBLOCK_CUH
 #define NANL_PAGEDMEMORYBLOCK_CUH
 
+#include "BaseMemoryBlock.cuh"
+#include "Deleters.cu"
+
 namespace NaNL {
 
     template<class T>
-    class PagedMemoryBlock {
+    class PagedMemoryBlock : public NaNL::Internal::BaseMemoryBlock<T> {
     protected:
-        std::unique_ptr<T[], void(*)(T*)> _matrix;
-
         inline explicit PagedMemoryBlock(uint64_t totalSize);
     };
 
