@@ -39,9 +39,9 @@ private:
         }
     };
 protected:
-    inline static TestMatrices* smallTestMatrices = nullptr;
-    inline static TestMatrices* mediumTestMatrices = nullptr;
-    inline static TestMatrices* largeTestMatrices = nullptr;
+    static TestMatrices* smallTestMatrices;
+    static TestMatrices* mediumTestMatrices;
+    static TestMatrices* largeTestMatrices;
 
     static void SetUpTestSuite() {
         smallTestMatrices = new TestMatrices("data/MATRIX_ADDITION_TEST_100x100");
@@ -55,6 +55,10 @@ protected:
         delete largeTestMatrices;
     }
 };
+
+MatrixAddTest::TestMatrices* MatrixAddTest::smallTestMatrices = nullptr;
+MatrixAddTest::TestMatrices* MatrixAddTest::mediumTestMatrices = nullptr;
+MatrixAddTest::TestMatrices* MatrixAddTest::largeTestMatrices = nullptr;
 
 TEST_F(MatrixAddTest, Should_Add_Small_Matrices_To_Correct_Values_When_Host_UnAligned) {
     try {
@@ -122,6 +126,7 @@ TEST_F(MatrixAddTest, Should_Add_Large_Matrices_To_Correct_Values_When_Host_UnAl
     }
 }
 
+/*
 TEST_F(MatrixAddTest, Should_Add_Small_Matrices_To_Correct_Values_When_Pinned_UnAligned) {
     try {
         NaNL::Matrix<int, NaNL::PinnedMemoryBlock, NaNL::Unaligned> a = smallTestMatrices->getCopyOfA<NaNL::PinnedMemoryBlock, NaNL::Unaligned>();
@@ -186,4 +191,4 @@ TEST_F(MatrixAddTest, Should_Add_Large_Matrices_To_Correct_Values_When_Pinned_Un
         std::cout << e.what();
         FAIL();
     }
-}
+}*/

@@ -31,8 +31,8 @@ namespace NaNL {
             std::chrono::time_point<std::chrono::steady_clock> endTimepoint;
         };
 
-        inline static Logger *instance;
-        inline static std::mutex mutex;
+        static Logger *instance;
+        static std::mutex mutex;
         std::unordered_map<int long long, std::deque<LoggerDetails>> activeLogs;
         std::unordered_map<int long long, std::deque<LoggerDetails>> inActiveLogs;
 

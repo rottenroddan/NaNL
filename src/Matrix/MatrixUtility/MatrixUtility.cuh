@@ -5,10 +5,11 @@
 #ifndef NANL_MATRIXUTILITY_CUH
 #define NANL_MATRIXUTILITY_CUH
 
-
+#include <type_traits>
 
 
 namespace NaNL {
+
     namespace Internal {
         class MatrixUtility {
         private:

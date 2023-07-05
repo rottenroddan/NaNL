@@ -19,13 +19,13 @@
 #include <iostream>
 #include <memory>
 #include <thread>
+#include <concepts>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
-
-
 namespace NaNL {
+
     template<class T, template<typename> class Memory = NaNL::PagedMemoryBlock,
             template<class, template<typename> class> class Alignment = NaNL::Unaligned>
     class BaseMatrix : public Alignment<T, Memory> {

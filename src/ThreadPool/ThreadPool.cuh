@@ -13,24 +13,16 @@
 #include <mutex>
 #include <queue>
 #include <thread>
-
-#include "../StaticBlock/StaticBlock.cuh"
+#include <type_traits>
 
 namespace NaNL {
 
-    /**
-     * ThreadPool is a singleton designed for queuing functions
-     * for a pool of threads to complete. Accessed using the
-     * getInstance() method; which returns a global instance.
-     * Use queue method to start a thread on a function. Returns
-     * a future object
-     */
     class ThreadPool {
     private:
-        inline static ThreadPool *_instance;
-        inline static std::mutex _queueMutex;
-        inline static std::mutex _instanceMutex;
-        inline static std::condition_variable _mutexCondition;
+        static ThreadPool* _instance;
+        static std::mutex _queueMutex;
+        static std::mutex _instanceMutex;
+        static std::condition_variable _mutexCondition;
 
         std::deque<std::thread> _threadPool;
         std::queue<std::function<void()>> _functionQueue;
@@ -38,20 +30,35 @@ namespace NaNL {
 
         inline void populatePool();
         inline void ThreadLoop();
+
     protected:
-        inline ThreadPool() { ; }
+        ThreadPool() = default;
+
     public:
         void operator=(const ThreadPool&) = delete;
-        inline static ThreadPool* getInstance();
+        static ThreadPool* getInstance();
 
         template<class F, class... Args>
-        inline auto queue(F&&, Args&&... args) -> std::future<typename std::invoke_result<F, Args...>::type>;
-        inline uint64_t getAllocatedThreads();
+        inline auto queue(F&& f, Args&&... args) -> std::future<decltype(f(args...))> {
+            using return_type = decltype(f(args...));
 
+            auto job = std::make_shared<std::packaged_task<return_type()>>(
+                    std::bind(std::forward<F>(f), std::forward<Args>(args)...)
+            );
+
+            std::future<return_type> result = job->get_future();
+            {
+                std::unique_lock<std::mutex> lock(_queueMutex);
+                this->_functionQueue.emplace([job]() { (*job)(); });
+            }
+            _mutexCondition.notify_one();
+            return result;
+        }
+
+        uint64_t getAllocatedThreads();
     };
 
 } // NaNL
 
-#include "ThreadPool.cu"
+#endif // NANL_THREADPOOL_CUH
 
-#endif //NANL_THREADPOOL_CUH

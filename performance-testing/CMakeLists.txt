@@ -1,5 +1,5 @@
 # 'Google_test' is the subproject name
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.25.2)
 project(Performance-Testing LANGUAGES CUDA CXX)
 
 find_package(CUDA REQUIRED)

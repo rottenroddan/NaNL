@@ -2,6 +2,7 @@
 // Created by steve on 6/1/2023.
 //
 
+#pragma once
 #include "MatrixUtility.cuh"
 
 namespace NaNL {

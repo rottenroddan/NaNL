@@ -8,7 +8,6 @@
 #include <PagedMemoryBlock.cuh>
 #include <PinnedMemoryBlock.cuh>
 #include <../Alignment/Unaligned.cuh>
-#include "../src/BaseMatrix/BaseMatrix.cuh"
 #include <Matrix.cuh>
 #include <type_traits>
 
@@ -62,6 +61,8 @@ int main() {
 
     NaNL::Matrix<int, PagedMemoryBlock, Unaligned> a(100, 100);
     NaNL::Matrix<int, PagedMemoryBlock, Unaligned> b;
+
+    a.add<PagedMemoryBlock, Unaligned>(b);
 
     b = std::move(a);
 
