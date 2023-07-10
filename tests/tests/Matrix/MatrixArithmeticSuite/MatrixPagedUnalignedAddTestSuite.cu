@@ -3,8 +3,8 @@
 //
 
 #include "gtest/gtest.h"
-#include "Matrix.cuh"
-#include "MatrixFileLoader/MatrixFileLoader.cuh"
+#include <Matrix.cuh>
+#include <MatrixFileLoader/MatrixFileLoader.cuh>
 
 
 class MatrixAddTest : public ::testing::Test {

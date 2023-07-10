@@ -3,7 +3,7 @@
 //
 
 #include "gtest/gtest.h"
-#include "Matrix.cuh"
+#include <Matrix.cuh>
 
 TEST(MatrixConstructorTestSuite,  Should_Construct_Paged_Unaligned_Matrix_And_Store_Correct_Rows_And_Columns_When_Provided) {
     NaNL::Matrix<long, NaNL::PagedMemoryBlock, NaNL::Unaligned> a(10, 20);

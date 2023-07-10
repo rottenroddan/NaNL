@@ -3,7 +3,7 @@
 //
 
 #include "gtest/gtest.h"
-#include "Matrix.cuh"
+#include <Matrix.cuh>
 
 TEST(BaseMatrixTestSuite, Should_Be_Able_To_Access_Paged_Unaligned_Matrix_When_Index_Is_Within_Bounds) {
     NaNL::Matrix<int, NaNL::PagedMemoryBlock, NaNL::Unaligned> a(10, 33);
