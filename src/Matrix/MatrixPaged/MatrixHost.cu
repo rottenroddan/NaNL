@@ -3,45 +3,145 @@
 //
 #include "Matrix.cuh"
 
-template<class T, template<typename> class Memory,
-        template<class, template<typename> class> class Alignment>
-NaNL::Matrix<T, Memory, Alignment>::Matrix(uint64_t rows, uint64_t cols) : BaseMatrix<T, Memory, Alignment>(rows, cols)
-{
+namespace NaNL {
+    template<class T, template<class, class> class Memory,
+            class Alignment>
+    Matrix<T, Memory, Alignment>::Matrix()
+            : BaseMatrix<T, Memory, Alignment>(0, 0) {
 
-}
+    }
 
-template<class T, template<typename> class Memory,
-        template<class, template<typename> class> class Alignment>
-NaNL::Matrix<T, Memory, Alignment>::Matrix(const Matrix<T, Memory, Alignment> &copyMatrix) noexcept : BaseMatrix<T, Memory, Alignment>(copyMatrix.getRows(), copyMatrix.getCols())
-{
-    for(uint64_t i = 0; i < this->rows; i++) {
-        for(uint64_t j = 0; j < this->cols; j++) {
-            this->operator[](i)[j] = copyMatrix.get(i,j);
+    template<class T, template<class, class> class Memory,
+            class Alignment>
+    Matrix<T, Memory, Alignment>::Matrix(uint64_t rows, uint64_t cols)
+            : BaseMatrix<T, Memory, Alignment>(rows, cols) {
+
+    }
+
+    template<class T, template<class, class> class Memory, class Alignment>
+    Matrix<T, Memory, Alignment>::Matrix(const Matrix<T, Memory, Alignment> &copyMatrix) noexcept
+            : BaseMatrix<T, Memory, Alignment>(copyMatrix.getRows(), copyMatrix.getCols()) {
+        for (uint64_t i = 0; i < this->rows; i++) {
+            for (uint64_t j = 0; j < this->cols; j++) {
+                this->operator[](i)[j] = copyMatrix.get(i, j);
+            }
         }
     }
-}
 
-template<class T, template<typename> class Memory,
-        template<class, template<typename> class> class Alignment>
-NaNL::Matrix<T, Memory, Alignment>::Matrix(Matrix<T, Memory, Alignment> &&copyMatrix) noexcept : BaseMatrix<T, Memory, Alignment>(copyMatrix.rows, copyMatrix.cols)
-{
-    this->_matrix = std::move(copyMatrix._matrix);
-}
+    template<class T, template<class, class> class Memory, class Alignment>
+    Matrix<T, Memory, Alignment>::Matrix(Matrix<T, Memory, Alignment> &&copyMatrix) noexcept
+            : BaseMatrix<T, Memory, Alignment>(copyMatrix.rows, copyMatrix.cols) {
+        this->_matrix = std::move(copyMatrix._matrix);
+    }
 
-template<class T, template<typename> class Memory,
-        template<class, template<typename> class> class Alignment>
-NaNL::Matrix<T, Memory, Alignment>&
-NaNL::Matrix<T, Memory, Alignment>::Matrix::operator=(const Matrix <T, Memory, Alignment> &rhs) {
-    return *this;
-}
+    template<class T, template<class, class> class Memory, class Alignment>
+    NaNL::Matrix<T, Memory, Alignment> &
+    NaNL::Matrix<T, Memory, Alignment>::Matrix::operator=(const Matrix<T, Memory, Alignment> &rhs) {
+        return *this;
+    }
 
-template<class T, template<typename> class Memory,
-        template<class, template<typename> class> class Alignment>
-template<template<typename> class rMemory,
-        template<class, template<typename> class> class rAlignment>
-NaNL::Matrix<T, rMemory, rAlignment> NaNL::Matrix<T, Memory, Alignment>::add(const Matrix<T, PagedMemoryBlock, Unaligned> &b, MatrixDeviceOperation device)
-{
-    return NaNL::MatrixUtility::add<T, rMemory, rAlignment>((const Matrix<T,Memory, Alignment>&)(*this), (const Matrix<T,Memory, Alignment>&)b, device);
+    template<class T, template<class, class> class Memory, class Alignment>
+    template<template<class, class> class rMemory, class rAlignment>
+    Matrix<T, rMemory, rAlignment> NaNL::Matrix<T, Memory, Alignment>::copyTo() const {
+
+        /*
+         * TODO: Clean this method up, a lot of redundancy
+         */
+        Matrix<T, rMemory, rAlignment> copyMatrix(this->getRows(), this->getCols());
+
+        if constexpr(std::is_base_of_v<Matrix<T, PagedMemoryBlock, rAlignment>, Matrix<T, rMemory, rAlignment>>
+                        && std::is_base_of_v<Matrix<T, PagedMemoryBlock, Alignment>, Matrix<T, Memory, Alignment>>) {
+            // host to host
+            if (Internal::MemoryTypes::Host == copyMatrix.getMemoryType() &&
+                Internal::MemoryTypes::Host == this->getMemoryType()) {
+                for (uint64_t i = 0; i < this->getRows(); i++) {
+                    for (uint64_t j = 0; j < this->getCols(); j++) {
+                        copyMatrix[i][j] = this->get(i, j);
+                    }
+                }
+
+                return copyMatrix;
+            }
+        }
+
+        // default
+        cudaMemcpyKind memcpyKind = cudaMemcpyHostToHost;
+
+        // pinned to pinned, or pinned to paged / paged to pinned.
+        if(Internal::MemoryTypes::CudaPinned == copyMatrix.getMemoryType() &&
+            (Internal::MemoryTypes::Host == this->getMemoryType() || Internal::MemoryTypes::CudaPinned == this->getMemoryType()) ||
+            Internal::MemoryTypes::CudaPinned == this->getMemoryType() &&
+            (Internal::MemoryTypes::Host == copyMatrix.getMemoryType() || Internal::MemoryTypes::CudaPinned == copyMatrix.getMemoryType())) {
+            //gpuErrchk(cudaMemcpy(copyMatrix.getMatrix(), this->getMatrix(), this->getTotalSize() * sizeof(T), cudaMemcpyHostToHost));
+            memcpyKind = cudaMemcpyHostToHost;
+        }
+
+        // host to device
+        if(Internal::MemoryTypes::CudaDevice == copyMatrix.getMemoryType() &&
+            (Internal::MemoryTypes::Host == this->getMemoryType() || Internal::MemoryTypes::CudaPinned == this->getMemoryType())) {
+            for(uint64_t i = 0; i < copyMatrix.getRows(); i++) {
+                gpuErrchk(cudaMemcpy(copyMatrix.getMatrix() + copyMatrix.getActualCols() * i, this->getMatrix() + this->getActualCols() * i, this->getActualCols() * sizeof(T), cudaMemcpyHostToDevice));
+            }
+            memcpyKind = cudaMemcpyHostToDevice;
+        }
+
+        // device to host
+        if((Internal::MemoryTypes::Host == copyMatrix.getMemoryType() || Internal::MemoryTypes::Host == copyMatrix.getMemoryType()) &&
+            Internal::MemoryTypes::CudaDevice == this->getMemoryType() ) {
+            for(uint64_t i = 0; i < copyMatrix.getRows(); i++) {
+                gpuErrchk(cudaMemcpy(copyMatrix.getMatrix() + copyMatrix.getActualCols() * i, this->getMatrix() + this->getActualCols() * i, this->getActualCols() * sizeof(T), cudaMemcpyDeviceToHost));
+            }
+            memcpyKind = cudaMemcpyDeviceToHost;
+        }
+
+        // device to device
+        if((Internal::MemoryTypes::CudaDevice == copyMatrix.getMemoryType() && Internal::MemoryTypes::CudaDevice == copyMatrix.getMemoryType())) {
+            for(uint64_t i = 0; i < copyMatrix.getRows(); i++) {
+                gpuErrchk(cudaMemcpy(copyMatrix.getMatrix() + copyMatrix.getActualCols() * i, this->getMatrix() + this->getActualCols() * i, this->getActualCols() * sizeof(T), cudaMemcpyDeviceToDevice));
+            }
+            memcpyKind = cudaMemcpyDeviceToDevice;
+        }
+
+        // Perform copy based on kind of copy decided from above.
+        // If the actual total size(for different alignments) is
+        // the same, we can perform a 1:1 copy rather a loop-based
+        // copy over.
+        if(this->getActualRows() == copyMatrix.getActualRows()
+            && this->getActualCols() == copyMatrix.getActualCols()
+            && this->getActualTotalSize() == copyMatrix.getActualTotalSize()) {
+            cudaMemcpy(copyMatrix.getMatrix(), this->getMatrix(), this->getActualTotalSize() * sizeof(T), memcpyKind);
+        } else {
+            for (uint64_t i = 0; i < copyMatrix.getRows(); i++) {
+                gpuErrchk(cudaMemcpy(copyMatrix.getMatrix() + copyMatrix.getActualCols() * i,
+                                     this->getMatrix() + this->getActualCols() * i, this->getActualCols() * sizeof(T),
+                                     memcpyKind));
+            }
+        }
+
+        return copyMatrix;
+    }
+
+    template<class T, template<class, class> class Memory, class Alignment>
+    template<template<class, class> class rMemory, class rAlignment>
+    Matrix<T, rMemory, rAlignment> NaNL::Matrix<T, Memory, Alignment>::moveTo() const {
+        return copyTo<rMemory, rAlignment>();
+    }
+
+    template<class T, template<class, class> class Memory, class Alignment>
+    template<template<class, class> class rMemory, class rAlignment,
+            template<class, class> class uMemory, class uAlignment>
+    Matrix<T, rMemory, rAlignment>
+    Matrix<T, Memory, Alignment>::add(const Matrix<T, uMemory, uAlignment> &b, MatrixDeviceOperation device) {
+
+        if (MatrixDeviceOperation::TensorCores == device) {
+
+        } else if (MatrixDeviceOperation::Cuda == device) {
+
+        } else /*Host*/ {
+            return NaNL::Internal::MatrixUtility::addHost
+                    <T, rMemory, rAlignment>((const Matrix<T, Memory, Alignment> &) (*this), b);
+        }
+    }
 }
 
 

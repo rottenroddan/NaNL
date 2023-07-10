@@ -1,0 +1,4 @@
+"C:\Program Files\CMake\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug "-DCMAKE_MAKE_PROGRAM=C:/Program Files/JetBrains/CLion 2022.1.1/bin/ninja/win/ninja.exe" "-DCMAKE_C_COMPILER=C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.36.32532/bin/Hostx64/x64/cl.exe" "-DCMAKE_CXX_COMPILER=C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.36.32532/bin/Hostx64/x64/cl.exe" "-DCMAKE_CUDA_COMPILER=C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.0/bin/nvcc.exe" -G Ninja -S C:\Users\steve\CLionProjects\NaNL -B C:\Users\steve\CLionProjects\NaNL\cmake-build-debug-visual-studio
+-- Configuring done (2.1s)
+-- Generating done (0.0s)
+-- Build files have been written to: C:/Users/steve/CLionProjects/NaNL/cmake-build-debug-visual-studio

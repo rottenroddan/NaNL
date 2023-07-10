@@ -23,8 +23,8 @@ MatrixFileLoader::MatrixFileLoader(const std::string& file)  {
     ss >> this->totalMatrices;
 }
 
-template<class T, template<typename> class Memory,
-        template<class, template<typename> class> class Alignment>
+template<class T, template<class, class> class Memory,
+        class Alignment>
 NaNL::Matrix<T, Memory, Alignment> MatrixFileLoader::readValuesIntoMatrix() {
     // get first line from file.
     std::string line;

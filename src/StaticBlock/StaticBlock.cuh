@@ -1,4 +1,4 @@
-#pragma once
+/*#pragma once
 #ifndef NANL_STATICBLOCK_CUH
 #define NANL_STATICBLOCK_CUH
 
@@ -14,4 +14,4 @@ struct Static_
 // `UNIQUE` macro required if we expect multiple `static` blocks in function
 #define _static_block_ static Static_ UNIQUE(block) = []() -> void
 
-#endif //NANL_STATICBLOCK_CUH
+#endif //NANL_STATICBLOCK_CUH*/

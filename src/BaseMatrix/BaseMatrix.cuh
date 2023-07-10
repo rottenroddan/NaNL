@@ -19,16 +19,16 @@
 #include <iostream>
 #include <memory>
 #include <thread>
+#include <concepts>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
-
-
 namespace NaNL {
-    template<class T, template<typename> class Memory = NaNL::PagedMemoryBlock,
-            template<class, template<typename> class> class Alignment = NaNL::Unaligned>
-    class BaseMatrix : public Alignment<T, Memory> {
+
+    template<class T, template<class, class> class Memory = NaNL::PagedMemoryBlock,
+            class Alignment = NaNL::Unaligned>
+    class BaseMatrix : public Memory<T, Alignment> {
     protected:
         /**
          * Private constructor, derived class must pass number of rows, columns and a function
@@ -46,8 +46,8 @@ namespace NaNL {
         //inline virtual void _copy(const BaseMatrix &copyOfMatrix) = 0;
 
     public:
-        static_assert(std::is_base_of<NaNL::BaseAlignment<T, Memory>, Alignment<T, Memory>>::value,
-                      "Template argument 'Alignment' must inherit from BaseAlignment class.");
+        //static_assert(std::is_base_of<NaNL::BaseAlignment<T, Memory>, Alignment<T, Memory>>::value,
+                      //"Template argument 'Alignment' must inherit from BaseAlignment class.");
 
         /**
          * Matrix exception for when the matrix array is accessed out of it's bounds.
@@ -77,22 +77,13 @@ namespace NaNL {
          */
         inline void copy(const BaseMatrix &copyOfMatrix);
 
-        /**
-         * Returns a pointer to the startTimepoint of the row based on the index provided.
-         * Then you can call a second [] and treat this as your column index.
-         * Like such: mxn matrix(M) -> M[3][10] (4th row, 11th column)
-         * @param i Index of the startTimepoint of the row you want to access.
-         * @return Pointer of type 'T' of the row at the provided index.
-         */
-        inline T *operator[](uint64_t i) noexcept;
+
 
         /**
-         * Returns the value associated at the ith and jth position.
-         * @param i Index of the row.
-         * @param j Index of the col.
-         * @return
+         *
+         * @param moveMatrix
          */
-        inline T get(uint64_t i, uint64_t j) const;
+        inline BaseMatrix<T, Memory, Alignment>& operator=(BaseMatrix<T, Memory, Alignment> &&moveMatrix) noexcept;
 
         /**
          * Compares this matrix to the referenced BaseMatrix. If both rows and
@@ -103,6 +94,7 @@ namespace NaNL {
         inline bool validateMatricesAreSameShape(const BaseMatrix<T, Memory, Alignment> &b) const;
 
         //BaseMatrix<T>& operator=(const BaseMatrix<T> &rhs);
+
 
         //virtual void subtract() = 0;
         //virtual void dot() = 0;

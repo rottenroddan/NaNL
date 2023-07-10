@@ -1,7 +1,9 @@
 #include <chrono>
 #include <iostream>
-#include <Matrix.cuh>
-#include "MatrixFileLoader/MatrixFileLoader.cuh"
+#include <ThreadPool.cuh>
+//#include <Matrix.cuh>
+//#include <MatrixFileLoader.cuh>
+#include <new>
 
 /*
 template <typename T>
@@ -52,8 +54,13 @@ int main() {
     std::cout << MAX_PINNED_SIZE << " bytes." <<std::endl;
     int* host_arr;
 
-    cudaError_t x = cudaMallocHost((void**)&host_arr, MAX_PINNED_SIZE);
-    std::cout << cudaGetErrorString(x) << std::endl;
+    NaNL::ThreadPool* pool = NaNL::ThreadPool::getInstance();
+//    std::future<int> result = pool->queue([] {std::cout << "Hello" << std::endl; return 1;});
+
+//    NaNL::Matrix<int> a(100, 100);
+//    NaNL::Matrix<int> b(100, 100);
+//
+//    a.add<NaNL::PagedMemoryBlock, NaNL::Unaligned>(b);
 
     /*
     NaNL::Matrix<int, NaNL::Device::Cuda> cudaWarmUp(1000, 1000);

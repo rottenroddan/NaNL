@@ -22,6 +22,15 @@ namespace NaNL {
      */
     template<typename T>
     inline void _freePinnedMemory(T *ptr_) { cudaFreeHost(ptr_); }
+
+    /**
+     * Function that frees device memory from the pointer provided.
+     * Calls <code>cudaFreeHost</code> to free device memory.
+     * @tparam T Pointer type.
+     * @param ptr_ Pointer to the address to free.
+     */
+    template<typename T>
+    inline void _freeDeviceMemory(T *ptr_) { cudaFree(ptr_); }
 }
 
 #endif

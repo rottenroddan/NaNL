@@ -5,14 +5,14 @@
 
 #pragma once
 
-template<class T, template<typename> class Memory,
-        template<class, template<typename> class> class Alignment>
-template<template<typename> class rMemory,
-        template<class, template<typename> class> class rAlignment>
-NaNL::Matrix<T, rMemory, rAlignment> NaNL::Matrix<T, Memory, Alignment>::add(const Matrix<T, PinnedMemoryBlock, Unaligned> &b, MatrixDeviceOperation device)
-{
-    return NaNL::MatrixUtility::add<T, rMemory, rAlignment>((const Matrix<T,Memory, Alignment>&)(*this), (const Matrix<T,Memory, Alignment>&)b, device);
-}
+//template<class T, template<typename> class Memory,
+//        template<class, template<typename> class> class Alignment>
+//template<template<typename> class rMemory,
+//        template<class, template<typename> class> class rAlignment>
+//NaNL::Matrix<T, rMemory, rAlignment> NaNL::Matrix<T, Memory, Alignment>::add(const Matrix<T, PinnedMemoryBlock, Unaligned> &b, MatrixDeviceOperation device)
+//{
+//    return NaNL::MatrixUtility::add<T, rMemory, rAlignment>((const Matrix<T,Memory, Alignment>&)(*this), (const Matrix<T,Memory, Alignment>&)b, device);
+//}
 
 //template<typename T>
 //NaNL::Matrix<T, NaNL::Device::Cuda>::Matrix(unsigned long numberOfRows, unsigned long numberOfCols) :
