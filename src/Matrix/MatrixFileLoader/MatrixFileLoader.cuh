@@ -25,8 +25,8 @@ public:
     inline unsigned long getTotalMatrices();
     inline unsigned long getCurrentMatrix();
 
-    template<class T, template<typename> class Memory = NaNL::PagedMemoryBlock,
-            template<class, template<typename> class> class Alignment = NaNL::Unaligned>
+    template<class T, template<class, class> class Memory = NaNL::PagedMemoryBlock,
+            class Alignment = NaNL::Unaligned>
     inline NaNL::Matrix<T, Memory, Alignment> readValuesIntoMatrix();
 
     inline ~MatrixFileLoader();

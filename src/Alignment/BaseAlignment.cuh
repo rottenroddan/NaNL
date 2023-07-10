@@ -6,8 +6,7 @@
 #define NANL_BASEALIGNMENT_CUH
 
 namespace NaNL {
-    template<class T, template<typename> class Memory>
-    class BaseAlignment : public Memory<T> {
+    class BaseAlignment {
     protected:
         inline BaseAlignment(uint64_t rows, uint64_t cols);
 

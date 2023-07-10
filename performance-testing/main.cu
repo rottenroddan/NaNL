@@ -1,18 +1,14 @@
 //
 // Created by steve on 2/26/2023.
 //
-#include <chrono>
-#include <iostream>
-#include <memory>
-#include <DeviceMemoryBlock.cuh>
-#include <PagedMemoryBlock.cuh>
-#include <PinnedMemoryBlock.cuh>
-#include <../Alignment/Unaligned.cuh>
-#include <Matrix.cuh>
-#include <type_traits>
 
-#include <cuda.h>
-#include <cuda_runtime.h>
+#include <iostream>
+#include <PinnedMemoryBlock.cuh>
+#include <PagedMemoryBlock.cuh>
+#include <DeviceMemoryBlock.cuh>
+#include <Matrix.cuh>
+
+
 
 //template<class T, template<typename> class Memory = NaNL::PagedMemoryBlock,
 //        template<class, template<typename > class >class Alignment = NaNL::Unaligned>
@@ -26,32 +22,36 @@
 //
 //};
 
-using namespace NaNL;
 
-class A {
-public:
-    int x;
+/*
+template <typename T, template <typename> class D>
+concept DerivedFromBase = std::is_base_of_v<Base<T>, D<T>>;
 
-    explicit A(int val) {
-        x = val;
-    }
+template<class T, template<typename> class U>
+void test(U<T>& a) requires DerivedFromBase<T, U> {
+    a.print();
+}
 
-    A(const A &a) {
-        this->x = a.x;
-    }
+template<typename T, template<typename, typename> class U, class V>
+concept IsDerivedFromHostMemoryBlock = std::is_base_of_v<NaNL::Internal::HostMemoryBlock<T, V>, U<T,V>>;
 
-    A& operator=(const A &copyA) noexcept {
-        this->x = 99;
-        return *this;
-    }
+template<class T, template<typename, typename> class U, class V>
+void matrixTest(U<T,V>& a) requires IsDerivedFromHostMemoryBlock<T, U , V> {
 
-    A& operator=(A &&moveA)  noexcept {
-        this->x = moveA.x;
-        return *this;
-    }
-};
+}*/
 
 int main() {
+
+   // test(aa);
+    //test(bb);
+
+    //static_assert(is_base<Base<int>, A<int>>::value, "If error: A is not derived from Base");
+
+//    A<int> aa;
+//    test(aa);
+
+    //B bb;
+    //test(bb);
 
 //    A a(10);
 //    A b(5);
@@ -59,12 +59,21 @@ int main() {
 //    b = std::move(a);
 //    std::cout << b.x << std::endl;
 
-    NaNL::Matrix<int, PagedMemoryBlock, Unaligned> a(100, 100);
-    NaNL::Matrix<int, PagedMemoryBlock, Unaligned> b;
+   // std::cout << sizeof(size_t) << std::endl;
 
-    a.add<PagedMemoryBlock, Unaligned>(b);
+    NaNL::Matrix<int, NaNL::PagedMemoryBlock, NaNL::Unaligned> a(100,100);
+    NaNL::Matrix<int, NaNL::PinnedMemoryBlock, NaNL::Unaligned> b(100, 100);
+    NaNL::Matrix<int, NaNL::DeviceMemoryBlock, NaNL::Unaligned> d(100, 100);
+    NaNL::Matrix<float, NaNL::PagedMemoryBlock, NaNL::Unaligned> aa(100,100);
 
-    b = std::move(a);
+    std::cout << a[0][0] << std::endl;
+
+   // matrixTest(a);
+   // matrixTest(b);
+   // matrixTest(d);
+    //matrixTest(d);
+
+    //a.add<NaNL::PagedMemoryBlock, NaNL::Unaligned>(b);
 
 
 //    std::chrono::time_point<std::chrono::high_resolution_clock> pagedStart, pagedEnd, pinnedStart, pinnedEnd;

@@ -3,6 +3,7 @@
 #include <ThreadPool.cuh>
 //#include <Matrix.cuh>
 //#include <MatrixFileLoader.cuh>
+#include <new>
 
 /*
 template <typename T>

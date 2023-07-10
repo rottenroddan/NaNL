@@ -6,14 +6,15 @@
 #define NANL_PINNEDMEMORYBLOCK_CUH
 
 #include "../CudaUtil/CudaUtil.cuh"
+#include "HostMemoryBlock.cuh"
 #include "Deleters.cu"
 
 namespace NaNL {
 
-    template<class T>
-    class PinnedMemoryBlock : public NaNL::Internal::BaseMemoryBlock<T> {
+    template<typename T, typename Alignment>
+    class PinnedMemoryBlock : public NaNL::Internal::HostMemoryBlock<T, Alignment> {
     protected:
-        inline explicit PinnedMemoryBlock(uint64_t totalSize);
+        inline explicit PinnedMemoryBlock(uint64_t rows, uint64_t cols);
     };
 
 } // NaNL

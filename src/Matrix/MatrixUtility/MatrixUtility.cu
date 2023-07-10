@@ -4,13 +4,20 @@
 
 #pragma once
 #include "MatrixUtility.cuh"
+#include <Windows.h>
 
 namespace NaNL {
     namespace Internal {
-        template<class T>
-        void MatrixUtility::addHost_Paged_Paged(const Matrix<T, PagedMemoryBlock, Unaligned> &a,
-                                                                 const Matrix<T, PagedMemoryBlock, Unaligned> &b,
-                                                                 Matrix<T, PagedMemoryBlock, Unaligned> &c) {
+
+        template<class T, template<class, class> class Memory, class Alignment,
+                template<class, class> class uMemory, class uAlignment,
+                template<class, class> class rMemory, class rAlignment>
+        void MatrixUtility::addHost_Paged_Paged(const Matrix<T, Memory, Alignment> &a,
+                                                const Matrix<T, uMemory, uAlignment> &b,
+                                                Matrix<T, rMemory, rAlignment> &c)
+                                                requires IsDerivedFromHostMemoryBlock<T, Memory, Alignment> &&
+                                                        IsDerivedFromHostMemoryBlock<T, uMemory, uAlignment> &&
+                                                        IsDerivedFromHostMemoryBlock<T, rMemory, rAlignment> {
             const T *_a = a.getMatrix();
             const T *_b = b.getMatrix();
             T *_c = c.getMatrix();
@@ -48,8 +55,8 @@ namespace NaNL {
         }
 
         /** TODO: delete I think? */
-        template<class T, template<typename> class Memory, template<class, template<typename> class> class Alignment,
-                template<typename> class uMemory, template<class, template<typename> class> class uAlignment>
+        template<class T, template<class, class> class Memory, class Alignment,
+                template<class, class> class uMemory, class uAlignment>
         void MatrixUtility::_copy(const Matrix<T, Memory, Alignment> &first, Matrix<T, uMemory, uAlignment> &second) {
             if(MemoryTypes::CudaDevice == first.getMemoryType()) {
                 if(MemoryTypes::CudaPinned == second.getMemoryType() || MemoryTypes::CudaPinned == second.getMemoryType() ) {
@@ -67,12 +74,12 @@ namespace NaNL {
         }
 
 
-        template<class T, template<typename> class rMemory,
-                template<class, template<typename> class> class rAlignment,
-                template<typename> class Memory,
-                template<class, template<typename> class> class Alignment,
-                template<typename> class uMemory,
-                template<class, template<typename> class> class uAlignment>
+        template<class T, template<class, class> class rMemory,
+                class rAlignment,
+                template<class, class> class Memory,
+                class Alignment,
+                template<class, class> class uMemory,
+                class uAlignment>
         Matrix<T, rMemory, rAlignment> MatrixUtility::addHost(const Matrix<T, Memory, Alignment> &a,
                                                                     const Matrix<T, uMemory, uAlignment> &b) {
             if (!a.validateMatricesAreSameShape(b)) {

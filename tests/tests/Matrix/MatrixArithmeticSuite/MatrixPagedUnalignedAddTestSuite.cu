@@ -23,17 +23,17 @@ private:
             truth = fileLoader.readValuesIntoMatrix<int>();
         }
 
-        template<template<typename> class rMemory, template<class, template<typename> class> class rAlignment>
+        template<template<class, class> class rMemory, class rAlignment>
         NaNL::Matrix<int, rMemory, rAlignment> getCopyOfA() {
             return a.template copyTo<rMemory, rAlignment>();
         }
 
-        template<template<typename> class rMemory, template<class, template<typename> class> class rAlignment>
+        template<template<class, class> class rMemory, class rAlignment>
         NaNL::Matrix<int, rMemory, rAlignment> getCopyOfB() {
             return b.template copyTo<rMemory, rAlignment>();
         }
 
-        template<template<typename> class rMemory, template<class, template<typename> class> class rAlignment>
+        template<template<class, class> class rMemory, class rAlignment>
         NaNL::Matrix<int, rMemory, rAlignment> getCopyOfTruth() {
             return truth.template copyTo<rMemory, rAlignment>();
         }

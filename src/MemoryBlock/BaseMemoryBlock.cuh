@@ -4,6 +4,7 @@
 
 #ifndef NANL_BASEMEMORYBLOCK_CUH
 #define NANL_BASEMEMORYBLOCK_CUH
+#include <new>
 
 namespace NaNL {
 
@@ -13,8 +14,8 @@ namespace NaNL {
             Host, CudaPinned, CudaDevice
         };
 
-        template<typename T>
-        class BaseMemoryBlock {
+        template<typename T, typename Alignment>
+        class BaseMemoryBlock : public Alignment {
         private:
             MemoryTypes memoryType;
             int64_t cudaDevice = -1;
@@ -24,9 +25,9 @@ namespace NaNL {
 
             inline void setDeleteFlag(bool deleted);
         public:
-            inline BaseMemoryBlock();
+            inline BaseMemoryBlock(uint64_t rows, uint64_t cols);
 
-            explicit inline BaseMemoryBlock(MemoryTypes type);
+            explicit inline BaseMemoryBlock(uint64_t rows, uint64_t cols, MemoryTypes type);
 
             inline MemoryTypes getMemoryType() const;
 

@@ -21,7 +21,7 @@ namespace NaNL {
 
         {
             std::unique_lock<std::mutex> printLock(_queueMutex);
-            std::cout << "[threadId: " << threadVal << "] waiting for jobs." << std::endl;
+            //std::cout << "[threadId: " << threadVal << "] waiting for jobs." << std::endl;
         }
 
         while (true) {

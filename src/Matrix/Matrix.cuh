@@ -22,8 +22,8 @@ namespace NaNL {
     class MatrixUtility;
 
 
-    template<class T, template<typename> class Memory = NaNL::PagedMemoryBlock,
-            template<class, template<typename> class> class Alignment = NaNL::Unaligned>
+    template<class T, template<class, class> class Memory = NaNL::PagedMemoryBlock,
+            class Alignment = NaNL::Unaligned>
     class Matrix : public BaseMatrix<T, Memory, Alignment> {
     protected:
         friend class MatrixUtility;
@@ -35,13 +35,13 @@ namespace NaNL {
         inline Matrix<T, Memory, Alignment> &operator=(const Matrix<T, Memory, Alignment> &rhs);
         inline Matrix<T, Memory, Alignment> &operator=(Matrix<T, Memory, Alignment> &&rhs)  noexcept = default;
 
-        template<template<typename> class rMemory, template<class, template<typename> class> class rAlignment>
+        template<template<class, class> class rMemory, class rAlignment>
         inline Matrix<T, rMemory, rAlignment> copyTo() const;
-        template<template<typename> class rMemory, template<class, template<typename> class> class rAlignment>
+        template<template<class, class> class rMemory, class rAlignment>
         inline Matrix<T, rMemory, rAlignment> moveTo() const;
 
-        template<template<typename> class rMemory, template<class, template<typename> class> class rAlignment,
-                template<typename> class uMemory, template<class, template<typename> class> class uAlignment>
+        template<template<class, class> class rMemory, class rAlignment,
+                template<class, class> class uMemory, class uAlignment>
         inline Matrix<T, rMemory, rAlignment> add(const Matrix<T, uMemory, uAlignment> &b, MatrixDeviceOperation device = MatrixDeviceOperation::Host);
 //        template<template<typename> class rMemory, template<class, template<typename> class> class rAlignment>
 //        inline Matrix<T, rMemory, rAlignment> add(const Matrix<T, PinnedMemoryBlock, Unaligned> &b, MatrixDeviceOperation device = MatrixDeviceOperation::Host);

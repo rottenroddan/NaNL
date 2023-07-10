@@ -8,8 +8,7 @@
 #include "BaseAlignment.cuh"
 
 namespace NaNL {
-    template<class T, template<typename> class Memory>
-    class Unaligned : public BaseAlignment<T,Memory>{
+    class Unaligned : public BaseAlignment {
     public:
         inline Unaligned(uint64_t rows, uint64_t cols);
         inline uint64_t getRows() const;

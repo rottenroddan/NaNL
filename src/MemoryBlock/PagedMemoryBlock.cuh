@@ -5,15 +5,15 @@
 #ifndef NANL_PAGEDMEMORYBLOCK_CUH
 #define NANL_PAGEDMEMORYBLOCK_CUH
 
-#include "BaseMemoryBlock.cuh"
+#include "HostMemoryBlock.cuh"
 #include "Deleters.cu"
 
 namespace NaNL {
 
-    template<class T>
-    class PagedMemoryBlock : public NaNL::Internal::BaseMemoryBlock<T> {
+    template<typename T, typename Alignment>
+    class PagedMemoryBlock : public NaNL::Internal::HostMemoryBlock<T, Alignment> {
     protected:
-        inline explicit PagedMemoryBlock(uint64_t totalSize);
+        inline explicit PagedMemoryBlock(uint64_t rows, uint64_t cols);
     };
 
 } // NaNL

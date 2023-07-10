@@ -27,6 +27,11 @@ add_executable(Tests
 target_link_libraries(Tests Matrix)
 target_link_libraries(Tests gtest gtest_main)
 
+set(CMAKE_CXX_STANDARD  20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CUDA_STANDARD 20)
+set(CMAKE_CUDA_STANDARD_REQUIRED ON)
+
 # Move files from test/data to BINARIES/test/data
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/data/)
 add_custom_command(

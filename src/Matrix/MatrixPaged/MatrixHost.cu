@@ -4,22 +4,21 @@
 #include "Matrix.cuh"
 
 namespace NaNL {
-    template<class T, template<typename> class Memory,
-            template<class, template<typename> class> class Alignment>
+    template<class T, template<class, class> class Memory,
+            class Alignment>
     Matrix<T, Memory, Alignment>::Matrix()
             : BaseMatrix<T, Memory, Alignment>(0, 0) {
 
     }
 
-    template<class T, template<typename> class Memory,
-            template<class, template<typename> class> class Alignment>
+    template<class T, template<class, class> class Memory,
+            class Alignment>
     Matrix<T, Memory, Alignment>::Matrix(uint64_t rows, uint64_t cols)
             : BaseMatrix<T, Memory, Alignment>(rows, cols) {
 
     }
 
-    template<class T, template<typename> class Memory,
-            template<class, template<typename> class> class Alignment>
+    template<class T, template<class, class> class Memory, class Alignment>
     Matrix<T, Memory, Alignment>::Matrix(const Matrix<T, Memory, Alignment> &copyMatrix) noexcept
             : BaseMatrix<T, Memory, Alignment>(copyMatrix.getRows(), copyMatrix.getCols()) {
         for (uint64_t i = 0; i < this->rows; i++) {
@@ -29,24 +28,20 @@ namespace NaNL {
         }
     }
 
-    template<class T, template<typename> class Memory,
-            template<class, template<typename> class> class Alignment>
+    template<class T, template<class, class> class Memory, class Alignment>
     Matrix<T, Memory, Alignment>::Matrix(Matrix<T, Memory, Alignment> &&copyMatrix) noexcept
             : BaseMatrix<T, Memory, Alignment>(copyMatrix.rows, copyMatrix.cols) {
         this->_matrix = std::move(copyMatrix._matrix);
     }
 
-    template<class T, template<typename> class Memory,
-            template<class, template<typename> class> class Alignment>
+    template<class T, template<class, class> class Memory, class Alignment>
     NaNL::Matrix<T, Memory, Alignment> &
     NaNL::Matrix<T, Memory, Alignment>::Matrix::operator=(const Matrix<T, Memory, Alignment> &rhs) {
         return *this;
     }
 
-    template<class T, template<typename> class Memory,
-            template<class, template<typename> class> class Alignment>
-    template<template<typename> class rMemory,
-            template<class, template<typename> class> class rAlignment>
+    template<class T, template<class, class> class Memory, class Alignment>
+    template<template<class, class> class rMemory, class rAlignment>
     Matrix<T, rMemory, rAlignment> NaNL::Matrix<T, Memory, Alignment>::copyTo() const {
 
         /*
@@ -54,16 +49,19 @@ namespace NaNL {
          */
         Matrix<T, rMemory, rAlignment> copyMatrix(this->getRows(), this->getCols());
 
-        // host to host
-        if(Internal::MemoryTypes::Host == copyMatrix.getMemoryType() &&
+        if constexpr(std::is_base_of_v<Matrix<T, PagedMemoryBlock, rAlignment>, Matrix<T, rMemory, rAlignment>>
+                        && std::is_base_of_v<Matrix<T, PagedMemoryBlock, Alignment>, Matrix<T, Memory, Alignment>>) {
+            // host to host
+            if (Internal::MemoryTypes::Host == copyMatrix.getMemoryType() &&
                 Internal::MemoryTypes::Host == this->getMemoryType()) {
-            for(uint64_t i = 0; i < this->getRows(); i++) {
-                for(uint64_t j = 0; j < this->getCols(); j++) {
-                    copyMatrix[i][j] = this->get(i, j);
+                for (uint64_t i = 0; i < this->getRows(); i++) {
+                    for (uint64_t j = 0; j < this->getCols(); j++) {
+                        copyMatrix[i][j] = this->get(i, j);
+                    }
                 }
-            }
 
-            return copyMatrix;
+                return copyMatrix;
+            }
         }
 
         // default
@@ -123,20 +121,15 @@ namespace NaNL {
         return copyMatrix;
     }
 
-    template<class T, template<typename> class Memory,
-            template<class, template<typename> class> class Alignment>
-    template<template<typename> class rMemory,
-            template<class, template<typename> class> class rAlignment>
+    template<class T, template<class, class> class Memory, class Alignment>
+    template<template<class, class> class rMemory, class rAlignment>
     Matrix<T, rMemory, rAlignment> NaNL::Matrix<T, Memory, Alignment>::moveTo() const {
         return copyTo<rMemory, rAlignment>();
     }
 
-    template<class T, template<typename> class Memory,
-            template<class, template<typename> class> class Alignment>
-    template<template<typename> class rMemory,
-            template<class, template<typename> class> class rAlignment,
-            template<typename> class uMemory,
-            template<class, template<typename> class> class uAlignment>
+    template<class T, template<class, class> class Memory, class Alignment>
+    template<template<class, class> class rMemory, class rAlignment,
+            template<class, class> class uMemory, class uAlignment>
     Matrix<T, rMemory, rAlignment>
     Matrix<T, Memory, Alignment>::add(const Matrix<T, uMemory, uAlignment> &b, MatrixDeviceOperation device) {
 

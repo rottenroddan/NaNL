@@ -5,12 +5,13 @@
 
 #include "PagedMemoryBlock.cuh"
 
-
 namespace NaNL {
-    template<class T>
-    PagedMemoryBlock<T>::PagedMemoryBlock(uint64_t totalSize) :
-    Internal::BaseMemoryBlock<T>(Internal::MemoryTypes::Host)
+
+    template<class T, class Alignment>
+    PagedMemoryBlock<T, Alignment>::PagedMemoryBlock(uint64_t rows, uint64_t cols) :
+    Internal::HostMemoryBlock<T, Alignment>(rows, cols, Internal::MemoryTypes::Host)
     {
-        this->_matrix = std::unique_ptr<T[], void (*)(T*)>(new T[totalSize], _freePagedMemory);
+        T* tempPtr = new T[rows * cols];
+        this->_matrix = std::unique_ptr<T[], void (*)(T*)>(tempPtr, _freePagedMemory);
     }
 }

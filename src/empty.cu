@@ -9,6 +9,7 @@
 #include "Logger/Logger.cuh"
 #include "CudaUtil/CudaUtil.cuh"
 #include "MemoryBlock/BaseMemoryBlock.cuh"
+#include "MemoryBlock/HostMemoryBlock.cuh"
 #include "MemoryBlock/PagedMemoryBlock.cuh"
 #include "MemoryBlock/PinnedMemoryBlock.cuh"
 #include "MemoryBlock/DeviceMemoryBlock.cuh"

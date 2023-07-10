@@ -14,10 +14,10 @@
 
 namespace NaNL {
 
-    template<class T>
-    class DeviceMemoryBlock : public Internal::BaseMemoryBlock<T> {
+    template<typename T, typename Alignment>
+    class DeviceMemoryBlock : public Internal::BaseMemoryBlock<T, Alignment> {
     protected:
-        inline explicit DeviceMemoryBlock(uint64_t totalSize);
+        inline explicit DeviceMemoryBlock(uint64_t rows, uint64_t cols);
     };
 
 } // NaNL

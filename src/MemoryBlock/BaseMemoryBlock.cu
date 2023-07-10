@@ -8,39 +8,41 @@ namespace NaNL {
 
     namespace Internal {
 
-        template<typename T>
-        BaseMemoryBlock<T>::BaseMemoryBlock() : BaseMemoryBlock(NaNL::Internal::MemoryTypes::Host) { ; }
+        template<typename T, typename Alignment>
+        BaseMemoryBlock<T, Alignment>::BaseMemoryBlock(uint64_t rows, uint64_t cols) : BaseMemoryBlock(rows, cols, NaNL::Internal::MemoryTypes::Host) { ; }
 
-        template<typename T>
-        BaseMemoryBlock<T>::BaseMemoryBlock(MemoryTypes type) : _matrix(nullptr, nullptr) , memoryType(type) { ; }
+        template<typename T, typename Alignment>
+        BaseMemoryBlock<T, Alignment>::BaseMemoryBlock(uint64_t rows, uint64_t cols, MemoryTypes type) : _matrix(nullptr, nullptr),
+        memoryType(type),
+        Alignment(rows, cols) { ; }
 
-        template<typename T>
-        MemoryTypes BaseMemoryBlock<T>::getMemoryType() const {
+        template<typename T, typename Alignment>
+        MemoryTypes BaseMemoryBlock<T, Alignment>::getMemoryType() const {
             return this->memoryType;
         }
 
-        template<typename T>
-        inline int64_t BaseMemoryBlock<T>::getCudaDevice() const {
+        template<typename T, typename Alignment>
+        inline int64_t BaseMemoryBlock<T, Alignment>::getCudaDevice() const {
             return this->cudaDevice;
         }
 
-        template<typename T>
-        inline void BaseMemoryBlock<T>::setCudaDevice(int64_t device) {
+        template<typename T, typename Alignment>
+        inline void BaseMemoryBlock<T, Alignment>::setCudaDevice(int64_t device) {
             this->cudaDevice = device;
         }
 
-        template<typename T>
-        inline T* BaseMemoryBlock<T>::getMatrix() const {
+        template<typename T, typename Alignment>
+        inline T* BaseMemoryBlock<T, Alignment>::getMatrix() const {
             return this->_matrix.get();
         }
 
-        template<typename T>
-        bool BaseMemoryBlock<T>::isDeleted() const {
+        template<typename T, typename Alignment>
+        bool BaseMemoryBlock<T, Alignment>::isDeleted() const {
             return this->deleted;
         }
 
-        template<typename T>
-        void BaseMemoryBlock<T>::setDeleteFlag(bool deleted) {
+        template<typename T, typename Alignment>
+        void BaseMemoryBlock<T, Alignment>::setDeleteFlag(bool deleted) {
             this->deleted = deleted;
         }
     }
