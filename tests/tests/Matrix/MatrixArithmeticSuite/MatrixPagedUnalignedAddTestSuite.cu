@@ -126,7 +126,6 @@ TEST_F(MatrixAddTest, Should_Add_Large_Matrices_To_Correct_Values_When_Host_UnAl
     }
 }
 
-/*
 TEST_F(MatrixAddTest, Should_Add_Small_Matrices_To_Correct_Values_When_Pinned_UnAligned) {
     try {
         NaNL::Matrix<int, NaNL::PinnedMemoryBlock, NaNL::Unaligned> a = smallTestMatrices->getCopyOfA<NaNL::PinnedMemoryBlock, NaNL::Unaligned>();
@@ -191,4 +190,4 @@ TEST_F(MatrixAddTest, Should_Add_Large_Matrices_To_Correct_Values_When_Pinned_Un
         std::cout << e.what();
         FAIL();
     }
-}*/
+}
