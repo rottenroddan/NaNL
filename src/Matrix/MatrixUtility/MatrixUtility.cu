@@ -90,34 +90,31 @@ namespace NaNL {
             // Since C is to be calculated on host, define as paged memory with return alignment.
             Matrix<T, PagedMemoryBlock, rAlignment> c(a.getRows(), a.getCols());
 
-            // host version of these objects.
-            Matrix<T, PagedMemoryBlock, Alignment> aCopyToHost;
-            Matrix<T, PagedMemoryBlock, uAlignment> bCopyToHost;
-            Matrix<T, PagedMemoryBlock, rAlignment> cCopyToHost;
-            const Matrix<T, Memory, Alignment>* _a = nullptr;
-            const Matrix<T, Memory, Alignment>* _b = nullptr;
-            Matrix<T, PagedMemoryBlock, rAlignment> *_c = &c;
-
-            // copy A to Paged memory from device.
-            if(a.getMemoryType() == MemoryTypes::CudaDevice ) {
-                aCopyToHost = a.template copyTo<PagedMemoryBlock, Alignment>();
-                _a = &aCopyToHost;
-            } else {
-                _a = &a;
+            // a & b are both derived from HostMemoryBlock
+            if constexpr(IsDerivedFromHostMemoryBlock<T, Memory, Alignment>
+                         && IsDerivedFromHostMemoryBlock<T, uMemory, uAlignment>) {
+                addHost_Paged_Paged(a, b, c);
             }
 
-            // copy B to Paged memory from device.
-            if(b.getMemoryType() == MemoryTypes::CudaDevice ) {
-                bCopyToHost = b.template copyTo<PagedMemoryBlock, uAlignment>();
-                _b = &bCopyToHost;
-            } else {
-                _b = &b;
+            // Only a is derived from HostMemoryBlock
+            else if constexpr(IsDerivedFromHostMemoryBlock<T, Memory, Alignment>
+                        && !IsDerivedFromHostMemoryBlock<T, uMemory, uAlignment>) {
+                addHost_Paged_Paged(a, b.template copyTo<Memory, Alignment>(), c);
             }
 
-            addHost_Paged_Paged(*_a, *_b, *_c);
+            // Only b is derived from HostMemoryBlock
+            else if constexpr(!IsDerivedFromHostMemoryBlock<T, Memory, Alignment>
+                              && IsDerivedFromHostMemoryBlock<T, uMemory, uAlignment>) {
+                addHost_Paged_Paged(a.template copyTo<uMemory, uAlignment>(), b, c);
+            }
+
+            // Neither a or b derived from HostMemoryBlock
+            else {
+                addHost_Paged_Paged(a.template copyTo<PagedMemoryBlock, uAlignment>(), b.template copyTo<PagedMemoryBlock, uAlignment>(), c);
+            }
 
             // TODO: move c to requested
-            return c.template moveTo<rMemory, rAlignment>();
+            return std::move(c).template moveTo<rMemory, rAlignment>();
         }
     }
 }

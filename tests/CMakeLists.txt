@@ -1,4 +1,5 @@
 # 'Google_test' is the subproject name
+cmake_minimum_required(VERSION 3.26.4)
 project(Tests LANGUAGES CUDA CXX)
 
 # 'lib' is the folder with Google Test sources
@@ -10,8 +11,11 @@ include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 #file(GLOB_RECURSE MY_FILES ${CMAKE_CURRENT_BINARY_DIR}/data/*)
 #file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/data/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/data/ )
 
+file(GLOB BASE_MATRIX_TEST_SRC CONFIGURE_DEPENDS "tests/Matrix/*/*TestSuite.cu")
+#file(GLOB MATRIX_ARITHMETIC_TEST_SRC CONFIGURE_DEPENDS "tests/Matrix/MatrixArithmeticSuites/*/*Test.cu")
 
-file(GLOB BASE_MATRIX_TEST_SRC CONFIGURE_DEPENDS "tests/Matrix/*/*.cu")
+
+#list(FILTER MATRIX_ARITHMETIC_SUITES_TEST_SRC INCLUDE REGEX "tests/Matrix/MatrixArithmeticSuites/*/.*Test\\.cu$")
 
 # file(GLOB BASE_MATRIX_TEST_SRC CONFIGURE_DEPENDS "tests/Matrix/BaseMatrixTestSuite/*.cu")
 # file(GLOB MATRIX_CONSTRUCTOR_TEST_SRC CONFIGURE_DEPENDS "tests/Matrix/MatrixConstructorSuite/*.cu")
@@ -21,6 +25,7 @@ file(GLOB BASE_MATRIX_TEST_SRC CONFIGURE_DEPENDS "tests/Matrix/*/*.cu")
 # 'test1.cpp tests2.cpp' are source files with tests
 add_executable(Tests
         ${BASE_MATRIX_TEST_SRC}
+        tests/Matrix/MatrixArithmeticSuites/MatrixArithmeticRunner/MatrixArithmeticRunner.cu
         tests/MatrixTestLoaderSuite.cu
         tests/ThreadPoolTestSuite.cu)
 

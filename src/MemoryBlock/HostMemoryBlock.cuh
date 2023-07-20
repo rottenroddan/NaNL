@@ -7,6 +7,7 @@
 
 #include "BaseMemoryBlock.cuh"
 
+
 namespace NaNL {
     namespace Internal {
 

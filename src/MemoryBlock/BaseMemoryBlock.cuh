@@ -4,7 +4,6 @@
 
 #ifndef NANL_BASEMEMORYBLOCK_CUH
 #define NANL_BASEMEMORYBLOCK_CUH
-#include <new>
 
 namespace NaNL {
 

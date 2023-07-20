@@ -38,7 +38,7 @@ namespace NaNL {
         template<template<class, class> class rMemory, class rAlignment>
         inline Matrix<T, rMemory, rAlignment> copyTo() const;
         template<template<class, class> class rMemory, class rAlignment>
-        inline Matrix<T, rMemory, rAlignment> moveTo() const;
+        inline Matrix<T, rMemory, rAlignment> moveTo() const &&;
 
         template<template<class, class> class rMemory, class rAlignment,
                 template<class, class> class uMemory, class uAlignment>
@@ -94,6 +94,7 @@ namespace NaNL {
 //    };
 }
 
+#include "../MatrixUtility/MatrixTypeTraits.cuh"
 #include "MatrixUtility/MatrixUtility.cuh"
 #include "MatrixPaged/MatrixHost.cu"
 #include "MatrixPinned/MatrixCuda.cu"

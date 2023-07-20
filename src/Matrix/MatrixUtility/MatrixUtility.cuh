@@ -24,6 +24,8 @@ namespace NaNL::Internal {
                                                     IsDerivedFromHostMemoryBlock<T, uMemory, uAlignment> &&
                                                     IsDerivedFromHostMemoryBlock<T, rMemory, rAlignment>;
 
+            /** TODO: I think we can delete this.
+             */
             template<class T, template<class, class> class Memory, class Alignment,
                     template<class, class> class uMemory, class uAlignment>
             static void _copy(const Matrix<T, Memory, Alignment> &first, Matrix<T, uMemory, uAlignment> &second);

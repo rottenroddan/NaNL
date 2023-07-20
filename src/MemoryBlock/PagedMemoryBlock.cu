@@ -2,7 +2,7 @@
 // Created by steve on 5/26/2023.
 //
 
-
+#include <new>
 #include "PagedMemoryBlock.cuh"
 
 namespace NaNL {
