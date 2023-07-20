@@ -1,5 +1,5 @@
 # 'Google_test' is the subproject name
-cmake_minimum_required(VERSION 3.25.2)
+cmake_minimum_required(VERSION 3.26.4)
 project(Performance-Testing LANGUAGES CUDA CXX)
 
 find_package(CUDA REQUIRED)
@@ -20,3 +20,4 @@ target_link_libraries(Performance-Testing PUBLIC Matrix)
 #set_target_properties(Performance-Testing PROPERTIES LINKER_LANGUAGE CXX)
 
 add_compile_definitions(PERFORMANCE_LOGGING)
+

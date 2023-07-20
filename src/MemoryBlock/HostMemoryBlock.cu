@@ -2,6 +2,7 @@
 // Created by steve on 7/8/2023.
 //
 
+
 #include "HostMemoryBlock.cuh"
 
 namespace NaNL {

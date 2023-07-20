@@ -1,7 +1,8 @@
 //
 // Created by steve on 11/27/2022.
 //
-#include "Matrix.cuh"
+#include "../Matrix.cuh"
+
 
 namespace NaNL {
     template<class T, template<class, class> class Memory,
@@ -62,59 +63,88 @@ namespace NaNL {
 
                 return copyMatrix;
             }
-        }
-
-        // default
-        cudaMemcpyKind memcpyKind = cudaMemcpyHostToHost;
-
-        // pinned to pinned, or pinned to paged / paged to pinned.
-        if(Internal::MemoryTypes::CudaPinned == copyMatrix.getMemoryType() &&
-            (Internal::MemoryTypes::Host == this->getMemoryType() || Internal::MemoryTypes::CudaPinned == this->getMemoryType()) ||
-            Internal::MemoryTypes::CudaPinned == this->getMemoryType() &&
-            (Internal::MemoryTypes::Host == copyMatrix.getMemoryType() || Internal::MemoryTypes::CudaPinned == copyMatrix.getMemoryType())) {
-            //gpuErrchk(cudaMemcpy(copyMatrix.getMatrix(), this->getMatrix(), this->getTotalSize() * sizeof(T), cudaMemcpyHostToHost));
-            memcpyKind = cudaMemcpyHostToHost;
-        }
-
-        // host to device
-        if(Internal::MemoryTypes::CudaDevice == copyMatrix.getMemoryType() &&
-            (Internal::MemoryTypes::Host == this->getMemoryType() || Internal::MemoryTypes::CudaPinned == this->getMemoryType())) {
-            for(uint64_t i = 0; i < copyMatrix.getRows(); i++) {
-                gpuErrchk(cudaMemcpy(copyMatrix.getMatrix() + copyMatrix.getActualCols() * i, this->getMatrix() + this->getActualCols() * i, this->getActualCols() * sizeof(T), cudaMemcpyHostToDevice));
-            }
-            memcpyKind = cudaMemcpyHostToDevice;
-        }
-
-        // device to host
-        if((Internal::MemoryTypes::Host == copyMatrix.getMemoryType() || Internal::MemoryTypes::Host == copyMatrix.getMemoryType()) &&
-            Internal::MemoryTypes::CudaDevice == this->getMemoryType() ) {
-            for(uint64_t i = 0; i < copyMatrix.getRows(); i++) {
-                gpuErrchk(cudaMemcpy(copyMatrix.getMatrix() + copyMatrix.getActualCols() * i, this->getMatrix() + this->getActualCols() * i, this->getActualCols() * sizeof(T), cudaMemcpyDeviceToHost));
-            }
-            memcpyKind = cudaMemcpyDeviceToHost;
-        }
-
-        // device to device
-        if((Internal::MemoryTypes::CudaDevice == copyMatrix.getMemoryType() && Internal::MemoryTypes::CudaDevice == copyMatrix.getMemoryType())) {
-            for(uint64_t i = 0; i < copyMatrix.getRows(); i++) {
-                gpuErrchk(cudaMemcpy(copyMatrix.getMatrix() + copyMatrix.getActualCols() * i, this->getMatrix() + this->getActualCols() * i, this->getActualCols() * sizeof(T), cudaMemcpyDeviceToDevice));
-            }
-            memcpyKind = cudaMemcpyDeviceToDevice;
-        }
-
-        // Perform copy based on kind of copy decided from above.
-        // If the actual total size(for different alignments) is
-        // the same, we can perform a 1:1 copy rather a loop-based
-        // copy over.
-        if(this->getActualRows() == copyMatrix.getActualRows()
-            && this->getActualCols() == copyMatrix.getActualCols()
-            && this->getActualTotalSize() == copyMatrix.getActualTotalSize()) {
-            cudaMemcpy(copyMatrix.getMatrix(), this->getMatrix(), this->getActualTotalSize() * sizeof(T), memcpyKind);
         } else {
-            for (uint64_t i = 0; i < copyMatrix.getRows(); i++) {
-                gpuErrchk(cudaMemcpy(copyMatrix.getMatrix() + copyMatrix.getActualCols() * i,
-                                     this->getMatrix() + this->getActualCols() * i, this->getActualCols() * sizeof(T),
-                                     memcpyKind));
+
+            // default
+            cudaMemcpyKind memcpyKind = cudaMemcpyHostToHost;
+
+            // pinned to pinned, or pinned to paged / paged to pinned.
+            if (Internal::MemoryTypes::CudaPinned == copyMatrix.getMemoryType() &&
+                (Internal::MemoryTypes::Host == this->getMemoryType() ||
+                 Internal::MemoryTypes::CudaPinned == this->getMemoryType()) ||
+                Internal::MemoryTypes::CudaPinned == this->getMemoryType() &&
+                (Internal::MemoryTypes::Host == copyMatrix.getMemoryType() ||
+                 Internal::MemoryTypes::CudaPinned == copyMatrix.getMemoryType())) {
+                //gpuErrchk(cudaMemcpy(copyMatrix.getMatrix(), this->getMatrix(), this->getTotalSize() * sizeof(T), cudaMemcpyHostToHost));
+                memcpyKind = cudaMemcpyHostToHost;
+            }
+
+            // host to device
+            if (Internal::MemoryTypes::CudaDevice == copyMatrix.getMemoryType() &&
+                (Internal::MemoryTypes::Host == this->getMemoryType() ||
+                 Internal::MemoryTypes::CudaPinned == this->getMemoryType())) {
+                //            if(this->getActualRows() == movedMatrix.getActualCols()
+                //               && this->getActualCols() == movedMatrix.getActualCols()) {
+                //                gpuErrchk(cudaMemcpy(copyMatrix.getMatrix(), this->getMatrix(), this->getActualTotalSize() * sizeof(T), cudaMemcpyHostToDevice));
+                //            } else {
+                //                for (uint64_t i = 0; i < copyMatrix.getRows(); i++) {
+                //                    gpuErrchk(cudaMemcpy(copyMatrix.getMatrix() + copyMatrix.getActualCols() * i,
+                //                                         this->getMatrix() + this->getActualCols() * i,
+                //                                         this->getActualCols() * sizeof(T), cudaMemcpyHostToDevice));
+                //                }
+                //            }
+                memcpyKind = cudaMemcpyHostToDevice;
+            }
+
+            // device to host
+            if ((Internal::MemoryTypes::Host == copyMatrix.getMemoryType() ||
+                 Internal::MemoryTypes::Host == copyMatrix.getMemoryType()) &&
+                Internal::MemoryTypes::CudaDevice == this->getMemoryType()) {
+                //            if(this->getActualRows() == movedMatrix.getActualCols()
+                //               && this->getActualCols() == movedMatrix.getActualCols()) {
+                //                gpuErrchk(cudaMemcpy(copyMatrix.getMatrix(), this->getMatrix(), this->getActualTotalSize() * sizeof(T), cudaMemcpyDeviceToHost));
+                //            } else {
+                //                for (uint64_t i = 0; i < copyMatrix.getRows(); i++) {
+                //                    gpuErrchk(cudaMemcpy(copyMatrix.getMatrix() + copyMatrix.getActualCols() * i,
+                //                                         this->getMatrix() + this->getActualCols() * i,
+                //                                         this->getActualCols() * sizeof(T), cudaMemcpyDeviceToHost));
+                //                }
+                //            }
+                memcpyKind = cudaMemcpyDeviceToHost;
+            }
+
+            // device to device
+            if ((Internal::MemoryTypes::CudaDevice == copyMatrix.getMemoryType() &&
+                 Internal::MemoryTypes::CudaDevice == this->getMemoryType())) {
+                //            if(this->getActualRows() == movedMatrix.getActualCols()
+                //               && this->getActualCols() == movedMatrix.getActualCols()) {
+                //                gpuErrchk(cudaMemcpy(copyMatrix.getMatrix(), this->getMatrix(), this->getActualTotalSize() * sizeof(T), cudaMemcpyDeviceToDevice));
+                //            } else {
+                //                for (uint64_t i = 0; i < copyMatrix.getRows(); i++) {
+                //                    gpuErrchk(cudaMemcpy(copyMatrix.getMatrix() + copyMatrix.getActualCols() * i,
+                //                                         this->getMatrix() + this->getActualCols() * i,
+                //                                         this->getActualCols() * sizeof(T), cudaMemcpyDeviceToDevice));
+                //                }
+                //            }
+                memcpyKind = cudaMemcpyDeviceToDevice;
+            }
+
+            // Perform copy based on kind of copy decided from above.
+            // If the actual total size(for different alignments) is
+            // the same, we can perform a 1:1 copy rather a loop-based
+            // copy over.
+            if (this->getActualRows() == copyMatrix.getActualRows()
+                && this->getActualCols() == copyMatrix.getActualCols()
+                && this->getActualTotalSize() == copyMatrix.getActualTotalSize()) {
+                cudaMemcpy(copyMatrix.getMatrix(), this->getMatrix(), this->getActualTotalSize() * sizeof(T),
+                           memcpyKind);
+            } else {
+                for (uint64_t i = 0; i < copyMatrix.getRows(); i++) {
+                    gpuErrchk(cudaMemcpy(copyMatrix.getMatrix() + copyMatrix.getActualCols() * i,
+                                         this->getMatrix() + this->getActualCols() * i,
+                                         this->getActualCols() * sizeof(T),
+                                         memcpyKind));
+                }
             }
         }
 
@@ -123,7 +153,61 @@ namespace NaNL {
 
     template<class T, template<class, class> class Memory, class Alignment>
     template<template<class, class> class rMemory, class rAlignment>
-    Matrix<T, rMemory, rAlignment> NaNL::Matrix<T, Memory, Alignment>::moveTo() const {
+    Matrix<T, rMemory, rAlignment> NaNL::Matrix<T, Memory, Alignment>::moveTo() const && {
+
+        // if moving to the same thing, just return.
+        if constexpr(std::is_base_of_v<Matrix<T, Memory, Alignment>, Matrix<T, rMemory, rAlignment>>) {
+            return *this;
+        }
+
+        // If this is Matrix is stored on host memory, and if the desired Matrix
+        // is also stored on host memory.
+        else if constexpr(NaNL::Internal::is_matrix_derived_from_paged_or_pinned<T, Memory, Alignment>
+                && NaNL::Internal::is_matrix_derived_from_paged_or_pinned<T, rMemory, rAlignment>) {
+            Matrix<T, rMemory, rAlignment> movedMatrix(this->getRows(), this->getCols());
+            for(uint64_t i = 0; i < this->getRows(); i++) {
+                for(uint64_t j = 0; j < this->getCols(); j++) {
+                    movedMatrix[i][j] = this->get(i,j);
+                }
+            }
+
+            return movedMatrix;
+        }
+        // Matrix is from Host to Device
+        else if constexpr(Internal::is_matrix_derived_from_paged_or_pinned<T, Memory, Alignment>
+                && Internal::is_matrix_derived_from_device<T, rMemory, rAlignment>){
+            Matrix<T, rMemory, rAlignment> movedMatrix(this->getRows(), this->getCols());
+            if(this->getActualRows() == movedMatrix.getActualCols()
+                && this->getActualCols() == movedMatrix.getActualCols()) {
+                cudaMemcpy(movedMatrix.getMatrix(), this->getMatrix(), sizeof(T) * this->getActualTotalSize(), cudaMemcpyHostToDevice);
+            } else {
+                for(uint64_t i = 0; i < this->getRows(); i++) {
+                    gpuErrchk(cudaMemcpy(movedMatrix.getMatrix() + movedMatrix.getActualCols() * i, this->getMatrix() + this->getActualCols() * i, this->getActualCols() * sizeof(T), cudaMemcpyHostToDevice));
+                }
+            }
+
+            return movedMatrix;
+        }
+        // Matrix is from Device to Host
+        else if constexpr(Internal::is_matrix_derived_from_device<T, Memory, Alignment>
+                && Internal::is_matrix_derived_from_paged_or_pinned<T, rMemory, rAlignment>) {
+            Matrix<T, rMemory, rAlignment> movedMatrix(this->getRows(), this->getCols());
+            if(this->getActualRows() == movedMatrix.getActualCols()
+               && this->getActualCols() == movedMatrix.getActualCols()) {
+                cudaMemcpy(movedMatrix.getMatrix(), this->getMatrix(), sizeof(T) * this->getActualTotalSize(), cudaMemcpyDeviceToHost);
+            } else {
+                for(uint64_t i = 0; i < movedMatrix.getRows(); i++) {
+                    gpuErrchk(cudaMemcpy(movedMatrix.getMatrix() + movedMatrix.getActualCols() * i, this->getMatrix() + this->getActualCols() * i, this->getActualCols() * sizeof(T), cudaMemcpyDeviceToHost));
+                }
+            }
+
+            return movedMatrix;
+        } else {
+            []<bool flag = false>() {
+                static_assert(flag, "There is no implementation for the Matrix::moveTo for this combination.");
+            };
+        }
+
         return copyTo<rMemory, rAlignment>();
     }
 

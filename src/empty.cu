@@ -17,5 +17,6 @@
 #include "Alignment/Unaligned.cuh"
 #include "BaseMatrix/BaseMatrix.cuh"
 #include "Matrix/Matrix.cuh"
+#include "Matrix/MatrixUtility/MatrixTypeTraits.cuh"
 
 #endif

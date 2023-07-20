@@ -99,22 +99,22 @@ namespace NaNL {
             // Only a is derived from HostMemoryBlock
             else if constexpr(IsDerivedFromHostMemoryBlock<T, Memory, Alignment>
                         && !IsDerivedFromHostMemoryBlock<T, uMemory, uAlignment>) {
-                addHost_Paged_Paged(a, b.template copyTo<uMemory, uAlignment>(), c);
+                addHost_Paged_Paged(a, b.template copyTo<Memory, Alignment>(), c);
             }
 
             // Only b is derived from HostMemoryBlock
-            else if constexpr(IsDerivedFromHostMemoryBlock<T, Memory, Alignment>
-                              && !IsDerivedFromHostMemoryBlock<T, uMemory, uAlignment>) {
+            else if constexpr(!IsDerivedFromHostMemoryBlock<T, Memory, Alignment>
+                              && IsDerivedFromHostMemoryBlock<T, uMemory, uAlignment>) {
                 addHost_Paged_Paged(a.template copyTo<uMemory, uAlignment>(), b, c);
             }
 
             // Neither a or b derived from HostMemoryBlock
             else {
-                addHost_Paged_Paged(a.template copyTo<uMemory, uAlignment>(), b.template copyTo<uMemory, uAlignment>(), c);
+                addHost_Paged_Paged(a.template copyTo<PagedMemoryBlock, uAlignment>(), b.template copyTo<PagedMemoryBlock, uAlignment>(), c);
             }
 
             // TODO: move c to requested
-            return c.template moveTo<rMemory, rAlignment>();
+            return std::move(c).template moveTo<rMemory, rAlignment>();
         }
     }
 }

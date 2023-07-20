@@ -61,10 +61,14 @@ int main() {
 
    // std::cout << sizeof(size_t) << std::endl;
 
-    NaNL::Matrix<int, NaNL::PagedMemoryBlock, NaNL::Unaligned> a(100,100);
     NaNL::Matrix<int, NaNL::PinnedMemoryBlock, NaNL::Unaligned> b(100, 100);
     NaNL::Matrix<int, NaNL::DeviceMemoryBlock, NaNL::Unaligned> d(100, 100);
+
+    NaNL::Matrix<int, NaNL::PagedMemoryBlock, NaNL::Unaligned> a(100,100);
     NaNL::Matrix<float, NaNL::PagedMemoryBlock, NaNL::Unaligned> aa(100,100);
+    NaNL::Matrix<float, NaNL::PagedMemoryBlock, NaNL::Unaligned> aaa(100,100);
+
+    NaNL::Matrix<double, NaNL::PagedMemoryBlock, NaNL::Unaligned> jjj(200,200);
 
     std::cout << a[0][0] << std::endl;
 
