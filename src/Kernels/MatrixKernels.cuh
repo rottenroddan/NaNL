@@ -8,11 +8,15 @@
 #include <cuda_runtime.h>
 #include <cuda_fp16.h>
 #include <iostream>
+#include <mma.h>
 
 
-namespace NaNL {
+namespace NaNL::Internal::Kernels {
     template<typename T>
-    __global__ void deviceAddMatrices(T *_dev_a, T *_dev_b, T *_dev_c, unsigned long mSize);
+    __global__ void deviceAddMatrices(const T *_dev_a, const T *_dev_b, T *_dev_c, unsigned long mSize);
+
+    template<typename T, typename U>
+    __global__ void deviceMatrixCast(T *_dev_a, U *_dev_b, unsigned long mSize);
 }
 
 

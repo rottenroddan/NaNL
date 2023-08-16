@@ -8,26 +8,33 @@
 namespace NaNL {
     class BaseAlignment {
     protected:
-        inline BaseAlignment(uint64_t rows, uint64_t cols);
+        inline BaseAlignment(uint64_t rows, uint64_t cols, uint64_t multiple = 1);
 
         uint64_t rows{}, actualRows{};
         uint64_t cols{}, actualCols{};
         uint64_t totalSize{}, actualTotalSize{};
     public:
-        virtual inline uint64_t getRows() const = 0;
+        [[nodiscard]] inline uint64_t getRows() const;
+        [[nodiscard]] inline uint64_t getCols() const;
+        [[nodiscard]] inline uint64_t getTotalSize() const;
+        [[nodiscard]] inline uint64_t getActualRows() const;
+        [[nodiscard]] inline uint64_t getActualCols() const;
+        [[nodiscard]] inline uint64_t getActualTotalSize() const;
 
-        virtual inline uint64_t getActualRows() const = 0;
-
-        virtual inline uint64_t getCols() const = 0;
-
-        virtual inline uint64_t getActualCols() const = 0;
-
-        virtual inline uint64_t getTotalSize() const = 0;
-
-        virtual inline uint64_t getActualTotalSize() const = 0;
-
-        virtual inline void align(uint64_t rows, uint64_t cols) = 0;
+        inline void align(uint64_t rows, uint64_t cols, uint64_t multiple = 1);
     };
+
+    template<typename Alignment>
+    concept IsAlignmentTypeDerivedOrSimilarToBaseAlignment = std::derived_from<Alignment, BaseAlignment> ||
+            requires (Alignment alignment) {
+        {alignment.getRows()} -> std::convertible_to<uint64_t>;
+        {alignment.getActualRows()} -> std::convertible_to<uint64_t>;
+        {alignment.getCols()} -> std::convertible_to<uint64_t>;
+        {alignment.getActualCols()} -> std::convertible_to<uint64_t>;
+        {alignment.getTotalSize()} -> std::convertible_to<uint64_t>;
+        {alignment.getActualTotalSize()} -> std::convertible_to<uint64_t>;
+        {alignment.align(0, 0)} -> std::convertible_to<uint64_t>;
+    } ;
 }
 
 

@@ -11,14 +11,10 @@ namespace NaNL {
     class Unaligned : public BaseAlignment {
     public:
         inline Unaligned(uint64_t rows, uint64_t cols);
-        inline uint64_t getRows() const;
-        inline uint64_t getActualRows() const;
-        inline uint64_t getCols() const;
-        inline uint64_t getActualCols() const;
-        inline uint64_t getTotalSize() const;
-        inline uint64_t getActualTotalSize() const;
-        inline void align(uint64_t rows, uint64_t cols);
     };
+
+    template<typename Alignment>
+    concept IsAlignmentTypeDerivedFromUnaligned = std::derived_from<Alignment, Unaligned>;
 
 } // NaNL
 

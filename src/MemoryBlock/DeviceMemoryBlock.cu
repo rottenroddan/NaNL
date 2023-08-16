@@ -6,7 +6,7 @@
 
 namespace NaNL {
     template<class T, typename Alignment>
-    NaNL::DeviceMemoryBlock<T, Alignment>::DeviceMemoryBlock(uint64_t rows, uint64_t cols) :
+    DeviceMemoryBlock<T, Alignment>::DeviceMemoryBlock(uint64_t rows, uint64_t cols) :
     Internal::BaseMemoryBlock<T, Alignment>(rows, cols, Internal::MemoryTypes::CudaDevice)
     {
         T *_deviceArr;

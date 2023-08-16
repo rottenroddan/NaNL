@@ -20,6 +20,7 @@ private:
     unsigned long currentMatrix = 0;
     std::ifstream file;
 public:
+    inline MatrixFileLoader() = delete;
     explicit inline MatrixFileLoader(const std::string& file);
 
     inline unsigned long getTotalMatrices();

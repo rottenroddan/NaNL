@@ -4,9 +4,9 @@
 
 #include "gtest/gtest.h"
 #include <Matrix.cuh>
-#include "MatrixAddSuite.cuh"
+#include "MatrixHostAddSuite.cuh"
 
-TEST_F(MatrixAddSuite, Should_Add_Small_Matrices_To_Correct_Values_When_Pinned_UnAligned) {
+TEST_F(MatrixHostAddSuite, Should_Add_Small_Matrices_To_Correct_Values_When_Pinned_UnAligned) {
     try {
         NaNL::Matrix<int, NaNL::PinnedMemoryBlock, NaNL::Unaligned> a = smallTestMatrices->getCopyOfA<NaNL::PinnedMemoryBlock, NaNL::Unaligned>();
         NaNL::Matrix<int, NaNL::PinnedMemoryBlock, NaNL::Unaligned> b = smallTestMatrices->getCopyOfB<NaNL::PinnedMemoryBlock, NaNL::Unaligned>();
@@ -28,7 +28,7 @@ TEST_F(MatrixAddSuite, Should_Add_Small_Matrices_To_Correct_Values_When_Pinned_U
     }
 }
 
-TEST_F(MatrixAddSuite, Should_Add_Medium_Matrices_To_Correct_Values_When_Pinned_UnAligned) {
+TEST_F(MatrixHostAddSuite, Should_Add_Medium_Matrices_To_Correct_Values_When_Pinned_UnAligned) {
     try {
         NaNL::Matrix<int, NaNL::PinnedMemoryBlock, NaNL::Unaligned> a = mediumTestMatrices->getCopyOfA<NaNL::PinnedMemoryBlock, NaNL::Unaligned>();
         NaNL::Matrix<int, NaNL::PinnedMemoryBlock, NaNL::Unaligned> b = mediumTestMatrices->getCopyOfB<NaNL::PinnedMemoryBlock, NaNL::Unaligned>();
@@ -50,7 +50,7 @@ TEST_F(MatrixAddSuite, Should_Add_Medium_Matrices_To_Correct_Values_When_Pinned_
     }
 }
 
-TEST_F(MatrixAddSuite, Should_Add_Large_Matrices_To_Correct_Values_When_Pinned_UnAligned) {
+TEST_F(MatrixHostAddSuite, Should_Add_Large_Matrices_To_Correct_Values_When_Pinned_UnAligned) {
     try {
         NaNL::Matrix<int, NaNL::PinnedMemoryBlock, NaNL::Unaligned> a = largeTestMatrices->getCopyOfA<NaNL::PinnedMemoryBlock, NaNL::Unaligned>();
         NaNL::Matrix<int, NaNL::PinnedMemoryBlock, NaNL::Unaligned> b = largeTestMatrices->getCopyOfB<NaNL::PinnedMemoryBlock, NaNL::Unaligned>();

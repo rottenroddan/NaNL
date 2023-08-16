@@ -1,17 +1,17 @@
 //
-// Created by steve on 7/16/2023.
+// Created by steve on 8/11/2023.
 //
 
 #pragma once
-#ifndef NANL_MATRIXADDSUITE_CUH
-#define NANL_MATRIXADDSUITE_CUH
+#ifndef NANL_MATRIXCUDAADDSUITE_CUH
+#define NANL_MATRIXCUDAADDSUITE_CUH
 
 #include "gtest/gtest.h"
 #include "../MatrixArithmeticUtility/TestMatrices.cuh"
 
 #include <MatrixFileLoader.cuh>
 
-class MatrixAddSuite : public ::testing::Test {
+class MatrixCudaAddSuite : public ::testing::Test {
 protected:
     static TestMatrices* smallTestMatrices;
     static TestMatrices* mediumTestMatrices;
@@ -22,6 +22,6 @@ protected:
     inline static void TearDownTestSuite();
 };
 
-#include "MatrixAddSuite.cu"
+#include "MatrixCudaAddSuite.cu"
 
-#endif //NANL_MATRIXADDSUITE_CUH
+#endif //NANL_MATRIXHOSTADDSUITE_CUH

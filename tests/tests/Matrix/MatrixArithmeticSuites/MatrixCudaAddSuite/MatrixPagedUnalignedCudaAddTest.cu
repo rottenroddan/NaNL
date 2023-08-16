@@ -1,18 +1,20 @@
 //
-// Created by steve on 6/6/2023.
+// Created by steve on 8/11/2023.
 //
 
 #include "gtest/gtest.h"
-#include "Matrix.cuh"
-#include "MatrixAddSuite.cuh"
+#include <Matrix.cuh>
+#include <DeviceMemoryBlock.cuh>
+#include "MatrixCudaAddSuite.cuh"
 
-TEST_F(MatrixAddSuite, Should_Add_Small_Matrices_To_Correct_Values_When_Host_UnAligned) {
+TEST_F(MatrixCudaAddSuite, Should_Add_Small_Matrices_To_Correct_Values_When_Host_UnAligned) {
     try {
         NaNL::Matrix<int> a = smallTestMatrices->getCopyOfA<NaNL::PagedMemoryBlock, NaNL::Unaligned>();
         NaNL::Matrix<int> b = smallTestMatrices->getCopyOfB<NaNL::PagedMemoryBlock, NaNL::Unaligned>();
         NaNL::Matrix<int> truth = smallTestMatrices->getCopyOfTruth<NaNL::PagedMemoryBlock, NaNL::Unaligned>();
 
-        auto c = a.add<NaNL::PagedMemoryBlock, NaNL::Unaligned>(b, NaNL::MatrixDeviceOperation::Host);
+        std::cout << "Test" << std::endl;
+        auto c = a.add<NaNL::PagedMemoryBlock, NaNL::Unaligned>(b, NaNL::MatrixDeviceOperation::Cuda);
 
         ASSERT_EQ(c.getRows(), truth.getRows());
         ASSERT_EQ(c.getCols(), truth.getCols());
@@ -28,13 +30,13 @@ TEST_F(MatrixAddSuite, Should_Add_Small_Matrices_To_Correct_Values_When_Host_UnA
     }
 }
 
-TEST_F(MatrixAddSuite, Should_Add_Medium_Matrices_To_Correct_Values_When_Host_UnAligned) {
+TEST_F(MatrixCudaAddSuite, Should_Add_Medium_Matrices_To_Correct_Values_When_Host_UnAligned) {
     try {
         NaNL::Matrix<int> a = mediumTestMatrices->getCopyOfA<NaNL::PagedMemoryBlock, NaNL::Unaligned>();
         NaNL::Matrix<int> b = mediumTestMatrices->getCopyOfB<NaNL::PagedMemoryBlock, NaNL::Unaligned>();
         NaNL::Matrix<int> truth = mediumTestMatrices->getCopyOfTruth<NaNL::PagedMemoryBlock, NaNL::Unaligned>();
 
-        auto c = a.add<NaNL::PagedMemoryBlock, NaNL::Unaligned>(b, NaNL::MatrixDeviceOperation::Host);
+        auto c = a.add<NaNL::PagedMemoryBlock, NaNL::Unaligned>(b, NaNL::MatrixDeviceOperation::Cuda);
 
         ASSERT_EQ(c.getRows(), truth.getRows());
         ASSERT_EQ(c.getCols(), truth.getCols());
@@ -50,13 +52,13 @@ TEST_F(MatrixAddSuite, Should_Add_Medium_Matrices_To_Correct_Values_When_Host_Un
     }
 }
 
-TEST_F(MatrixAddSuite, Should_Add_Large_Matrices_To_Correct_Values_When_Host_UnAligned) {
+TEST_F(MatrixCudaAddSuite, Should_Add_Large_Matrices_To_Correct_Values_When_Host_UnAligned) {
     try {
         NaNL::Matrix<int> a = largeTestMatrices->getCopyOfA<NaNL::PagedMemoryBlock, NaNL::Unaligned>();
         NaNL::Matrix<int> b = largeTestMatrices->getCopyOfB<NaNL::PagedMemoryBlock, NaNL::Unaligned>();
         NaNL::Matrix<int> truth = largeTestMatrices->getCopyOfTruth<NaNL::PagedMemoryBlock, NaNL::Unaligned>();
 
-        auto c = a.add<NaNL::PagedMemoryBlock, NaNL::Unaligned>(b);
+        auto c = a.add<NaNL::PagedMemoryBlock, NaNL::Unaligned>(b, NaNL::MatrixDeviceOperation::Cuda);
 
         ASSERT_EQ(c.getRows(), truth.getRows());
         ASSERT_EQ(c.getCols(), truth.getCols());
@@ -66,9 +68,9 @@ TEST_F(MatrixAddSuite, Should_Add_Large_Matrices_To_Correct_Values_When_Host_UnA
                 ASSERT_EQ(c[i][j], truth[i][j]);
             }
         }
+
     } catch (std::exception e) {
         std::cout << e.what();
         FAIL();
     }
 }
-

@@ -25,11 +25,21 @@ TEST(MatrixConstructorTestSuite,  Should_Construct_Pinned_Unaligned_Matrix_And_S
 
 NaNL::Matrix<int> hostMatrixRValueHelper(unsigned long rows, unsigned long cols) {
     NaNL::Matrix<int> m(rows,cols);
+    for(uint64_t i = 0; i < m.getRows(); i++) {
+        for(uint64_t j = 0; j < m.getCols(); j++) {
+            m[i][j] = i*j;
+        }
+    }
     return m;
 }
 
 NaNL::Matrix<int, NaNL::PinnedMemoryBlock, NaNL::Unaligned> cudaMatrixRValueHelper(unsigned long rows, unsigned long cols) {
     NaNL::Matrix<int, NaNL::PinnedMemoryBlock, NaNL::Unaligned> m(rows,cols);
+    for(uint64_t i = 0; i < m.getRows(); i++) {
+        for(uint64_t j = 0; j < m.getCols(); j++) {
+            m[i][j] = i*j;
+        }
+    }
     return m;
 }
 
@@ -40,6 +50,12 @@ TEST(MatrixConstructorTestSuite, Should_Shallow_Copy_Paged_Unaligned_Matrix_When
     NaNL::Matrix<int, NaNL::PagedMemoryBlock, NaNL::Unaligned> hostMatrix = hostMatrixRValueHelper(rows, cols);
     ASSERT_EQ(hostMatrix.getRows(), rows);
     ASSERT_EQ(hostMatrix.getCols(), cols);
+
+    for(uint64_t i = 0; i < hostMatrix.getRows(); i++) {
+        for(uint64_t j = 0; j < hostMatrix.getCols(); j++) {
+            ASSERT_EQ(hostMatrix[i][j],i*j);
+        }
+    }
 }
 
 TEST(MatrixConstructorTestSuite, Should_Shallow_Copy_Pinned_Unaligned_Matrix_When_RValue_Is_Passed_Back) {
@@ -49,6 +65,12 @@ TEST(MatrixConstructorTestSuite, Should_Shallow_Copy_Pinned_Unaligned_Matrix_Whe
     NaNL::Matrix<int, NaNL::PinnedMemoryBlock, NaNL::Unaligned> cudaMatrix = cudaMatrixRValueHelper(rows, cols);
     ASSERT_EQ(cudaMatrix.getRows(), rows);
     ASSERT_EQ(cudaMatrix.getCols(), cols);
+
+    for(uint64_t i = 0; i < cudaMatrix.getRows(); i++) {
+        for(uint64_t j = 0; j < cudaMatrix.getCols(); j++) {
+            ASSERT_EQ(cudaMatrix[i][j],i*j);
+        }
+    }
 }
 
 TEST(MatrixConstructorTestSuite, Should_Deep_Copy_Paged_Unaligned_Matrix_When_Matrix_Is_Set_To_Other) {
