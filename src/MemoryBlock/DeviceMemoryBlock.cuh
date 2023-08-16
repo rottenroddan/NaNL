@@ -13,13 +13,14 @@
 #include <cuda_runtime.h>
 
 namespace NaNL {
+        template<typename T, typename Alignment>
+        class DeviceMemoryBlock : public Internal::BaseMemoryBlock<T, Alignment> {
+        protected:
+            inline explicit DeviceMemoryBlock(uint64_t rows, uint64_t cols);
+        };
 
-    template<typename T, typename Alignment>
-    class DeviceMemoryBlock : public Internal::BaseMemoryBlock<T, Alignment> {
-    protected:
-        inline explicit DeviceMemoryBlock(uint64_t rows, uint64_t cols);
-    };
-
+        template<class T, template<typename, typename> class Memory, class Alignment>
+        concept IsDerivedFromDeviceMemoryBlock = std::derived_from<Memory<T, Alignment>, DeviceMemoryBlock<T, Alignment>>;
 } // NaNL
 
 #include "DeviceMemoryBlock.cu"

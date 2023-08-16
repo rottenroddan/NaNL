@@ -12,6 +12,7 @@
 #include "../Alignment/Unaligned.cuh"
 #include "../MemoryBlock/PagedMemoryBlock.cuh"
 #include "../MemoryBlock/PinnedMemoryBlock.cuh"
+#include "../MemoryBlock/DeviceMemoryBlock.cuh"
 #include "../Logger/Logger.cuh"
 #include "../MemoryBlock/Deleters.cu"
 
@@ -20,6 +21,7 @@
 #include <memory>
 #include <thread>
 #include <concepts>
+#include <shared_mutex>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -30,6 +32,7 @@ namespace NaNL {
             class Alignment = NaNL::Unaligned>
     class BaseMatrix : public Memory<T, Alignment> {
     protected:
+
         /**
          * Private constructor, derived class must pass number of rows, columns and a function
          * for freeing memory that is allocated.

@@ -36,6 +36,7 @@ set_property(TARGET Matrix PROPERTY CUDA_ARCHITECTURES 80)
 
 target_include_directories(Matrix PUBLIC ${CUDA_INCLUDE_DIRS}
         Kernels
+        Alignment
         Matrix
         Matrix/MatrixFileLoader
         Matrix/MatrixUtility

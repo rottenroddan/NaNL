@@ -11,6 +11,7 @@
 #include <MatrixFileLoader.cuh>
 
 class TestMatrices {
+    MatrixFileLoader fileLoader;
     NaNL::Matrix<int> a;
     NaNL::Matrix<int> b;
     NaNL::Matrix<int> truth;

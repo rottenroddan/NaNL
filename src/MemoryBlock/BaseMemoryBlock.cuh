@@ -38,6 +38,16 @@ namespace NaNL {
 
             inline bool isDeleted() const;
         };
+
+        template<typename T, template<typename, typename> class Memory, typename Alignment>
+        concept IsTypeDerivedFromBaseMemoryBlock = std::derived_from<Memory<T, Alignment>, BaseMemoryBlock<T, Alignment>> ||
+        requires (Memory<T, Alignment> memory) {
+            {memory.getMemoryType()} -> std::convertible_to<MemoryTypes>;
+            {memory.getMatrix()} -> std::convertible_to<T*>;
+            {memory.isDeleted()} -> std::convertible_to<bool>;
+            {memory.getCudaDevice()} -> std::convertible_to<int64_t>;
+            {memory.setCudaDevice((int64_t)0)};
+        };
     }
 } // NaNL
 

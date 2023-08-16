@@ -4,13 +4,12 @@
 
 #include "TestMatrices.cuh"
 
-TestMatrices::TestMatrices(std::string filePath) {
-    MatrixFileLoader fileLoader(filePath);
+TestMatrices::TestMatrices(std::string filePath) : fileLoader(filePath),
+    a(fileLoader.readValuesIntoMatrix<int>()),
+    b(fileLoader.readValuesIntoMatrix<int>()),
+    truth(fileLoader.readValuesIntoMatrix<int>())
+{
 
-    // read file into Matrices.
-    a = fileLoader.readValuesIntoMatrix<int>();
-    b = fileLoader.readValuesIntoMatrix<int>();
-    truth = fileLoader.readValuesIntoMatrix<int>();
 }
 
 template<template<class, class> class rMemory, class rAlignment>

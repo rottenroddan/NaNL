@@ -16,27 +16,27 @@ namespace NaNL {
 
     enum class MatrixDeviceOperation { Host, Cuda, TensorCores };
 
-    /**
-     * Forward declaration that this class will exist.
-     */
-    class MatrixUtility;
-
+    template<typename T, template<typename, typename> class U, class V>
+    concept IsDerivedFromHostMemoryBlock = std::is_base_of_v<NaNL::Internal::HostMemoryBlock<T, V>, U<T,V>>;
 
     template<class T, template<class, class> class Memory = NaNL::PagedMemoryBlock,
             class Alignment = NaNL::Unaligned>
     class Matrix : public BaseMatrix<T, Memory, Alignment> {
     protected:
-        friend class MatrixUtility;
+        mutable std::shared_mutex _shared_mutex;
     public:
-        inline Matrix();
         inline Matrix(uint64_t rows, uint64_t cols);
         inline Matrix(const Matrix<T, Memory, Alignment> &copyMatrix) noexcept;
         inline Matrix(Matrix<T, Memory, Alignment> &&copyMatrix) noexcept;
         inline Matrix<T, Memory, Alignment> &operator=(const Matrix<T, Memory, Alignment> &rhs);
         inline Matrix<T, Memory, Alignment> &operator=(Matrix<T, Memory, Alignment> &&rhs)  noexcept = default;
 
-        template<template<class, class> class rMemory, class rAlignment>
-        inline Matrix<T, rMemory, rAlignment> copyTo() const;
+        template<template<class, class> class rMemory, class rAlignment, class R = T>
+        inline Matrix<R, rMemory, rAlignment> copyTo() const;
+
+//        template<template<class, class> class rMemory, class rAlignment, class R = T>
+//        inline Matrix<R, rMemory, rAlignment> copyToCast() const;
+
         template<template<class, class> class rMemory, class rAlignment>
         inline Matrix<T, rMemory, rAlignment> moveTo() const &&;
 
@@ -46,6 +46,18 @@ namespace NaNL {
 //        template<template<typename> class rMemory, template<class, template<typename> class> class rAlignment>
 //        inline Matrix<T, rMemory, rAlignment> add(const Matrix<T, PinnedMemoryBlock, Unaligned> &b, MatrixDeviceOperation device = MatrixDeviceOperation::Host);
 
+        template<template<class, class> class rMemory, class rAlignment,
+                template<class, class> class uMemory, class uAlignment>
+        static Matrix<T, rMemory, rAlignment>
+        addHost(const Matrix<T, Memory, Alignment> &a, const Matrix<T, uMemory, uAlignment> &b);
+
+        template<template<class, class> class rMemory, class rAlignment,
+                template<class, class> class uMemory, class uAlignment>
+        static Matrix<T, rMemory, rAlignment>
+        addCuda(const Matrix<T, Memory, Alignment> &a, const Matrix<T, uMemory, uAlignment> &b);
+
+//        Matrix <T, rMemory, rAlignment>
+//        addCuda(const Matrix <T, Memory, Alignment> &a, const Matrix <T, uMemory, uAlignment> &b);
     };
 
 //    template<class T>
@@ -96,8 +108,7 @@ namespace NaNL {
 
 #include "../MatrixUtility/MatrixTypeTraits.cuh"
 #include "MatrixUtility/MatrixUtility.cuh"
-#include "MatrixPaged/MatrixHost.cu"
-#include "MatrixPinned/MatrixCuda.cu"
-//#include "MatrixDevice/MatrixDevice.cu"
+#include "MatrixOperations.cu"
+#include "Matrix.cu"
 
 #endif //NANL_MATRIX_CUH

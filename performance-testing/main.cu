@@ -7,40 +7,27 @@
 #include <PagedMemoryBlock.cuh>
 #include <DeviceMemoryBlock.cuh>
 #include <Matrix.cuh>
+#include <TensorCoreAligned32.cuh>
+#include <type_traits>
 
+#include <math.h>
 
-
-//template<class T, template<typename> class Memory = NaNL::PagedMemoryBlock,
-//        template<class, template<typename > class >class Alignment = NaNL::Unaligned>
-//class BaseMatrix : protected Alignment<T,Memory> {
-//public:
-//    static_assert(std::is_base_of<NaNL::BaseAlignment<T, Memory> ,Alignment<T, Memory>>::value, "Template argument 'Alignment' must inherit from BaseAlignment class." );
-//
-//    BaseMatrix(uint64_t rows, uint64_t cols) : Alignment<T, Memory>(rows, cols)  {
-//
-//    }
-//
-//};
-
-
-/*
-template <typename T, template <typename> class D>
-concept DerivedFromBase = std::is_base_of_v<Base<T>, D<T>>;
-
-template<class T, template<typename> class U>
-void test(U<T>& a) requires DerivedFromBase<T, U> {
-    a.print();
+NaNL::Matrix<int> test() {
+    NaNL::Matrix<int> x(200, 200);
+    x[0][100] = 19099;
+    return x;
 }
 
-template<typename T, template<typename, typename> class U, class V>
-concept IsDerivedFromHostMemoryBlock = std::is_base_of_v<NaNL::Internal::HostMemoryBlock<T, V>, U<T,V>>;
-
-template<class T, template<typename, typename> class U, class V>
-void matrixTest(U<T,V>& a) requires IsDerivedFromHostMemoryBlock<T, U , V> {
-
-}*/
+double sin(double x) {
+    return x/100;
+}
 
 int main() {
+
+    double k = 200.0;
+    std::cout << sin(k) << std::endl;
+
+
 
    // test(aa);
     //test(bb);
@@ -61,16 +48,28 @@ int main() {
 
    // std::cout << sizeof(size_t) << std::endl;
 
-    NaNL::Matrix<int, NaNL::PinnedMemoryBlock, NaNL::Unaligned> b(100, 100);
-    NaNL::Matrix<int, NaNL::DeviceMemoryBlock, NaNL::Unaligned> d(100, 100);
+    NaNL::Matrix<int, NaNL::PagedMemoryBlock, NaNL::TensorCoreAligned32> x(100, 100);
 
-    NaNL::Matrix<int, NaNL::PagedMemoryBlock, NaNL::Unaligned> a(100,100);
-    NaNL::Matrix<float, NaNL::PagedMemoryBlock, NaNL::Unaligned> aa(100,100);
-    NaNL::Matrix<float, NaNL::PagedMemoryBlock, NaNL::Unaligned> aaa(100,100);
+    NaNL::Matrix<int, NaNL::PagedMemoryBlock, NaNL::Unaligned> y(test());
 
-    NaNL::Matrix<double, NaNL::PagedMemoryBlock, NaNL::Unaligned> jjj(200,200);
+    std::cout << y[0][100] << std::endl;
 
-    std::cout << a[0][0] << std::endl;
+
+//    NaNL::Matrix<int, NaNL::PinnedMemoryBlock, NaNL::Unaligned> b(100, 100);
+//    NaNL::Matrix<int, NaNL::DeviceMemoryBlock, NaNL::Unaligned> d(100, 100);
+//
+//    //NaNL::Matrix<int, NaNL::PinnedMemoryBlock, NaNL::Unaligned>::addHost<>(b, d);
+//
+//    NaNL::Matrix<int, NaNL::PagedMemoryBlock, NaNL::Unaligned> a(100,100);
+//    NaNL::Matrix<float, NaNL::PagedMemoryBlock, NaNL::Unaligned> aa(100,100);
+//    NaNL::Matrix<float, NaNL::PagedMemoryBlock, NaNL::Unaligned> aaa(100,100);
+//
+//    NaNL::Matrix<double, NaNL::PagedMemoryBlock, NaNL::Unaligned> jjj(200,200);
+//
+//
+//    b.getMatrix();
+//
+//    std::cout << a[0][0] << std::endl;
 
    // matrixTest(a);
    // matrixTest(b);
