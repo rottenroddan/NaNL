@@ -2,7 +2,6 @@
 // Created by steve on 8/11/2023.
 //
 
-#pragma once
 #ifndef NANL_MATRIXCUDAADDSUITE_CUH
 #define NANL_MATRIXCUDAADDSUITE_CUH
 

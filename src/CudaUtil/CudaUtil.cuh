@@ -6,8 +6,6 @@
 #define NANL_CUDAUTIL_CUH
 
 namespace NaNL {
-
-
     inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
     {
         if (code != cudaSuccess)

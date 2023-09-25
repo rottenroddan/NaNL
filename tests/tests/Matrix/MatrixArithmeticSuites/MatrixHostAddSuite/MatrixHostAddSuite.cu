@@ -9,9 +9,9 @@ TestMatrices* MatrixHostAddSuite::mediumTestMatrices = nullptr;
 TestMatrices* MatrixHostAddSuite::largeTestMatrices = nullptr;
 
 void MatrixHostAddSuite::SetUpTestSuite() {
-    smallTestMatrices = new TestMatrices("data/MATRIX_ADDITION_TEST_100x100");
-    mediumTestMatrices = new TestMatrices("data/MATRIX_ARITHMETIC_TEST_1327x1823");
-    largeTestMatrices = new TestMatrices("data/MATRIX_ADDITION_TEST_5000x5000");
+    smallTestMatrices = new TestMatrices("data/bin/MATRIX_ADDITION_TEST_100x100.bin");
+    mediumTestMatrices = new TestMatrices("data/bin/MATRIX_ADDITION_TEST_1327x1823.bin");
+    largeTestMatrices = new TestMatrices("data/bin/MATRIX_ADDITION_TEST_5000x5000.bin");
 }
 
 void MatrixHostAddSuite::TearDownTestSuite() {

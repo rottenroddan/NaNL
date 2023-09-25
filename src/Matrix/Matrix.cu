@@ -103,6 +103,11 @@ namespace NaNL {
 
 
     template<class T, template<class, class> class Memory, class Alignment>
+    std::shared_mutex &Matrix<T, Memory, Alignment>::getMutex() const {
+        return this->_shared_mutex;
+    }
+
+    template<class T, template<class, class> class Memory, class Alignment>
     template<template<class, class> class rMemory, class rAlignment, class R>
     Matrix<R, rMemory, rAlignment> NaNL::Matrix<T, Memory, Alignment>::copyTo() const {
         std::shared_lock<std::shared_mutex> lock(this->_shared_mutex);
@@ -135,7 +140,7 @@ namespace NaNL {
                                cudaMemcpyHostToDevice);
                 } else {
                     auto castMatrix = this->copyTo<Memory, Alignment, R>();
-                    cudaMemcpy(copyMatrix.getMatrix(), castMatrix.getMatrix(), castMatrix.getActualTotalSize() * sizeof(T),
+                    cudaMemcpy(copyMatrix.getMatrix(), castMatrix.getMatrix(), castMatrix.getActualTotalSize() * sizeof(R),
                                cudaMemcpyHostToDevice);
                 }
             } else {
@@ -143,7 +148,7 @@ namespace NaNL {
                     for (uint64_t i = 0; i < copyMatrix.getRows(); i++) {
                         gpuErrchk(cudaMemcpy(copyMatrix.getMatrix() + copyMatrix.getActualCols() * i,
                                              this->getMatrix() + this->getActualCols() * i,
-                                             this->getActualCols() * sizeof(T),
+                                             this->getCols() * sizeof(T),
                                              cudaMemcpyHostToDevice));
                     }
                 } else {
@@ -151,7 +156,7 @@ namespace NaNL {
                     for (uint64_t i = 0; i < copyMatrix.getRows(); i++) {
                         gpuErrchk(cudaMemcpy(copyMatrix.getMatrix() + copyMatrix.getActualCols() * i,
                                              castMatrix.getMatrix() + castMatrix.getActualCols() * i,
-                                             castMatrix.getActualCols() * sizeof(T),
+                                             castMatrix.getCols() * sizeof(R),
                                              cudaMemcpyHostToDevice));
                     }
                 }
@@ -167,7 +172,7 @@ namespace NaNL {
                                cudaMemcpyDeviceToHost);
                 } else {
                     auto castMatrix = Internal::_castMatricesOnCuda<T, Memory, Alignment, R>(*this);
-                    cudaMemcpy(copyMatrix.getMatrix(), castMatrix.getMatrix(), castMatrix.getActualTotalSize() * sizeof(T),
+                    cudaMemcpy(copyMatrix.getMatrix(), castMatrix.getMatrix(), castMatrix.getActualTotalSize() * sizeof(R),
                                cudaMemcpyDeviceToHost);
                 }
             } else {
@@ -175,7 +180,7 @@ namespace NaNL {
                     for (uint64_t i = 0; i < copyMatrix.getRows(); i++) {
                         gpuErrchk(cudaMemcpy(copyMatrix.getMatrix() + copyMatrix.getActualCols() * i,
                                              this->getMatrix() + this->getActualCols() * i,
-                                             this->getActualCols() * sizeof(T),
+                                             this->getCols() * sizeof(T),
                                              cudaMemcpyDeviceToHost));
                     }
                 } else {
@@ -183,7 +188,7 @@ namespace NaNL {
                     for (uint64_t i = 0; i < copyMatrix.getRows(); i++) {
                         gpuErrchk(cudaMemcpy(copyMatrix.getMatrix() + copyMatrix.getActualCols() * i,
                                              castMatrix.getMatrix() + castMatrix.getActualCols() * i,
-                                             castMatrix.getActualCols() * sizeof(T),
+                                             castMatrix.getCols() * sizeof(R),
                                              cudaMemcpyDeviceToHost));
                     }
                 }
@@ -191,36 +196,8 @@ namespace NaNL {
         } // device to device
         else if constexpr(Internal::is_matrix_derived_from_device<T, Memory, Alignment>
                           && Internal::is_matrix_derived_from_device<T, rMemory, rAlignment>) {
-            if (this->getActualRows() == copyMatrix.getActualRows()
-                && this->getActualCols() == copyMatrix.getActualCols()
-                && this->getActualTotalSize() == copyMatrix.getActualTotalSize()) {
-                if constexpr (std::is_same_v<T, R>) {
-                    cudaMemcpy(copyMatrix.getMatrix(), this->getMatrix(), this->getActualTotalSize() * sizeof(T),
-                               cudaMemcpyDeviceToDevice);
-                } else {
-                    auto castMatrix = Internal::_castMatricesOnCuda<T, Memory, Alignment, R>(*this);
-                    cudaMemcpy(copyMatrix.getMatrix(), castMatrix.getMatrix(), copyMatrix.getActualTotalSize() * sizeof(T),
-                               cudaMemcpyDeviceToDevice);
-                }
-            }
-            else {
-                if constexpr (std::is_same_v<T,R>) {
-                    for (uint64_t i = 0; i < copyMatrix.getRows(); i++) {
-                        gpuErrchk(cudaMemcpy(copyMatrix.getMatrix() + copyMatrix.getActualCols() * i,
-                                             this->getMatrix() + this->getActualCols() * i,
-                                             this->getActualCols() * sizeof(T),
-                                             cudaMemcpyDeviceToDevice));
-                    }
-                } else {
-                    auto castMatrix = Internal::_castMatricesOnCuda<T, Memory, Alignment, R>(*this);
-                    for (uint64_t i = 0; i < copyMatrix.getRows(); i++) {
-                        gpuErrchk(cudaMemcpy(copyMatrix.getMatrix() + copyMatrix.getActualCols() * i,
-                                             castMatrix.getMatrix() + castMatrix.getActualCols() * i,
-                                             castMatrix.getActualCols() * sizeof(R),
-                                             cudaMemcpyDeviceToDevice));
-                    }
-                }
-            }
+            //Internal::testAgain<T>(100);
+            return Internal::_copyDeviceToDevice<T, Memory, Alignment, rMemory, rAlignment, R>((Matrix<T, Memory, Alignment> &)(*this));
         }
 
         return copyMatrix;
@@ -236,7 +213,28 @@ namespace NaNL {
 
         // if moving to the same thing, just return.
         if constexpr(std::is_base_of_v<Matrix<T, Memory, Alignment>, Matrix<T, rMemory, rAlignment>>) {
-            return *this;
+            if constexpr (Internal::is_matrix_derived_from_device<T, Memory, Alignment>
+                    && Internal::is_matrix_derived_from_device<T, rMemory, rAlignment>) {
+                // check if they exist on same device.
+                int currentDevice;
+                gpuErrchk(cudaGetDevice(&currentDevice));
+                if(this->getCudaDevice() != currentDevice) {
+                    Matrix<T, rMemory, rAlignment> movedMatrix(this->getRows(), this->getCols());
+                    if(this->getActualRows() == movedMatrix.getActualCols()
+                       && this->getActualCols() == movedMatrix.getActualCols()) {
+                        cudaMemcpyPeer(movedMatrix.getMatrix(), movedMatrix.getCudaDevice(), this->getMatrix(), this->getCudaDevice(), sizeof(T) * this->getActualTotalSize());
+                    } else {
+                        for(uint64_t i = 0; i < this->getRows(); i++) {
+                            gpuErrchk(cudaMemcpyPeer(movedMatrix.getMatrix(), movedMatrix.getCudaDevice(), this->getMatrix(), this->getCudaDevice(), sizeof(T) * this->getActualTotalSize()));
+                        }
+                    }
+                    return movedMatrix;
+                } else {
+                    return *this;
+                }
+            } else {
+                return *this;
+            }
         }
 
         // If this is Matrix is stored on host memory, and if the desired Matrix
@@ -256,7 +254,7 @@ namespace NaNL {
         else if constexpr(Internal::is_matrix_derived_from_paged_or_pinned<T, Memory, Alignment>
                 && Internal::is_matrix_derived_from_device<T, rMemory, rAlignment>){
             Matrix<T, rMemory, rAlignment> movedMatrix(this->getRows(), this->getCols());
-            if(this->getActualRows() == movedMatrix.getActualCols()
+            if(this->getActualRows() == movedMatrix.getActualRows()
                 && this->getActualCols() == movedMatrix.getActualCols()) {
                 cudaMemcpy(movedMatrix.getMatrix(), this->getMatrix(), sizeof(T) * this->getActualTotalSize(), cudaMemcpyHostToDevice);
             } else {
@@ -271,7 +269,7 @@ namespace NaNL {
         else if constexpr(Internal::is_matrix_derived_from_device<T, Memory, Alignment>
                 && Internal::is_matrix_derived_from_paged_or_pinned<T, rMemory, rAlignment>) {
             Matrix<T, rMemory, rAlignment> movedMatrix(this->getRows(), this->getCols());
-            if(this->getActualRows() == movedMatrix.getActualCols()
+            if(this->getActualRows() == movedMatrix.getActualRows()
                && this->getActualCols() == movedMatrix.getActualCols()) {
                 cudaMemcpy(movedMatrix.getMatrix(), this->getMatrix(), sizeof(T) * this->getActualTotalSize(), cudaMemcpyDeviceToHost);
             } else {
@@ -292,13 +290,13 @@ namespace NaNL {
     template<template<class, class> class rMemory, class rAlignment,
             template<class, class> class uMemory, class uAlignment>
     Matrix<T, rMemory, rAlignment>
-    Matrix<T, Memory, Alignment>::add(const Matrix<T, uMemory, uAlignment> &b, MatrixDeviceOperation device) {
-        std::shared_lock<std::shared_mutex> aLock(this->_shared_mutex);
-        std::shared_lock<std::shared_mutex> bLock(b._shared_mutex);
+    Matrix<T, Memory, Alignment>::add(const Matrix<T, uMemory, uAlignment> &b, MatrixAddOperation device) {
+        std::shared_lock<std::shared_mutex> aLock(this->getMutex());
+        std::shared_lock<std::shared_mutex> bLock(b.getMutex());
 
-        if (MatrixDeviceOperation::TensorCores == device) {
+        if (MatrixAddOperation::TensorCores == device) {
 
-        } else if (MatrixDeviceOperation::Cuda == device) {
+        } else if (MatrixAddOperation::Cuda == device) {
             return addCuda<rMemory, rAlignment, uMemory, uAlignment>((const Matrix<T, Memory, Alignment> &) (*this), b);
         } else /*Host*/ {
             //return addHost<T, rMemory, rAlignment>((const Matrix<T, Memory, Alignment> &) (*this), b);
@@ -311,29 +309,29 @@ namespace NaNL {
             template<class, class> class uMemory, class uAlignment>
     Matrix<T, rMemory, rAlignment> Matrix<T, Memory, Alignment>::addHost(const Matrix<T, Memory, Alignment> &a,
                                                           const Matrix<T, uMemory, uAlignment> &b) {
-        if (!a.validateMatricesAreSameShape(b)) {
-            // TODO: throw exception eventually
-            //throw a.MatrixIsInvalidShape("");
-        }
+//        if (!a.validateMatricesAreSameShape(b)) {
+//            // TODO: throw exception eventually
+//            //throw a.MatrixIsInvalidShape("");
+//        }
 
         // Since C is to be calculated on host, define as paged memory with return alignment.
         Matrix<T, PagedMemoryBlock, rAlignment> c(a.getRows(), a.getCols());
 
         // a & b are both derived from HostMemoryBlock
         if constexpr(IsDerivedFromHostMemoryBlock<T, Memory, Alignment>
-                                                             && IsDerivedFromHostMemoryBlock<T, uMemory, uAlignment>) {
+                && IsDerivedFromHostMemoryBlock<T, uMemory, uAlignment>) {
             Internal::_addMatricesOnHost(a, b, c);
         }
 
         // Only a is derived from HostMemoryBlock
         else if constexpr(IsDerivedFromHostMemoryBlock<T, Memory, Alignment>
-                                                                  && !IsDerivedFromHostMemoryBlock<T, uMemory, uAlignment>) {
+                && !IsDerivedFromHostMemoryBlock<T, uMemory, uAlignment>) {
             Internal::_addMatricesOnHost(a, b.template copyTo<PagedMemoryBlock, uAlignment>(), c);
         }
 
         // Only b is derived from HostMemoryBlock
         else if constexpr(!IsDerivedFromHostMemoryBlock<T, Memory, Alignment>
-                                                                   && IsDerivedFromHostMemoryBlock<T, uMemory, uAlignment>) {
+                && IsDerivedFromHostMemoryBlock<T, uMemory, uAlignment>) {
             Internal::_addMatricesOnHost(a.template copyTo<PagedMemoryBlock, Alignment>(), b, c);
         }
 
@@ -352,12 +350,16 @@ namespace NaNL {
             template<class, class> class uMemory, class uAlignment>
     Matrix<T, rMemory, rAlignment> Matrix<T, Memory, Alignment>::addCuda(const Matrix<T, Memory, Alignment> &a,
                                                                          const Matrix<T, uMemory, uAlignment> &b) {
-        if (!a.validateMatricesAreSameShape(b)) {
-            // TODO: throw exception eventually
-            //throw a.MatrixIsInvalidShape("");
-        }
+//        if (!a.validateMatricesAreSameShape(b)) {
+//            // TODO: throw exception eventually
+//            //throw a.MatrixIsInvalidShape("");
+//        }
 
         // Since C is to be calculated on host, define as paged memory with return alignment.
+        std::unique_ptr<Matrix<T, DeviceMemoryBlock, rAlignment>> aDevicePtr;
+        std::unique_ptr<Matrix<T, DeviceMemoryBlock, rAlignment>> bDevicePtr;
+
+
         Matrix<T, DeviceMemoryBlock, rAlignment> c(a.getRows(), a.getCols());
 
         // a & b are both derived from HostMemoryBlock
@@ -366,19 +368,19 @@ namespace NaNL {
             Internal::_addMatricesOnCuda(a, b, c);
         }
 
-            // Only a is derived from HostMemoryBlock
+        // Only a is derived from HostMemoryBlock
         else if constexpr(IsDerivedFromDeviceMemoryBlock<T, Memory, Alignment>
                           && !IsDerivedFromDeviceMemoryBlock<T, uMemory, uAlignment>) {
             Internal::_addMatricesOnCuda(a, b.template copyTo<DeviceMemoryBlock, uAlignment>(), c);
         }
 
-            // Only b is derived from HostMemoryBlock
+        // Only b is derived from HostMemoryBlock
         else if constexpr(!IsDerivedFromDeviceMemoryBlock<T, Memory, Alignment>
                           && IsDerivedFromDeviceMemoryBlock<T, uMemory, uAlignment>) {
             Internal::_addMatricesOnCuda(a.template copyTo<DeviceMemoryBlock, Alignment>(), b, c);
         }
 
-            // Neither a or b derived from HostMemoryBlock
+        // Neither a or b derived from HostMemoryBlock
         else {
             Internal::_addMatricesOnCuda(a.template copyTo<DeviceMemoryBlock, Alignment>(),
                                          b.template copyTo<DeviceMemoryBlock, uAlignment>(), c);

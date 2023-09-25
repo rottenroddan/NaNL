@@ -18,7 +18,7 @@ set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 #enable_language(CUDA)
 find_package(CUDAToolkit REQUIRED)
 
-add_library(Matrix STATIC ThreadPool/ThreadPool.cuh ThreadPool/ThreadPool.cu empty.cu)
+add_library(Matrix STATIC ThreadPool/ThreadPool.cuh ThreadPool/ThreadPool.cu Logger/Logger.cuh Logger/Logger.cu empty.cu)
 
 target_link_libraries(Matrix CUDA::cudart)
 target_link_libraries(Matrix CUDA::cuda_driver)

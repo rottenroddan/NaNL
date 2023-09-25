@@ -2,7 +2,7 @@
 // Created by steve on 7/16/2023.
 //
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 // host operations
 #include "../MatrixHostAddSuite/MatrixPagedUnalignedAddTest.cu"
@@ -14,6 +14,9 @@
 
 // cuda operations
 #include "../MatrixCudaAddSuite/MatrixPagedUnalignedCudaAddTest.cu"
+
+// multi-gpu tests
+#include "../MatrixMultiCudaAddSuite/MatrixMultiCudaAddTest.cu"
 
 
 int main(int argc, char** argv) {

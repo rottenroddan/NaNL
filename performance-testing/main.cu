@@ -7,25 +7,131 @@
 #include <PagedMemoryBlock.cuh>
 #include <DeviceMemoryBlock.cuh>
 #include <Matrix.cuh>
+#include <MatrixFileLoader.cuh>
+#include <MatrixOutBinaryFileLoader.cuh>
+#include <MatrixInBinaryFileLoader.cuh>
 #include <TensorCoreAligned32.cuh>
 #include <type_traits>
 
 #include <math.h>
 
-NaNL::Matrix<int> test() {
-    NaNL::Matrix<int> x(200, 200);
-    x[0][100] = 19099;
-    return x;
+float p2p_copy (size_t size)
+{
+    int *pointers[2];
+
+    cudaSetDevice (0);
+    cudaDeviceEnablePeerAccess (1, 0);
+    cudaMalloc (&pointers[0], size);
+
+    cudaSetDevice (1);
+    cudaDeviceEnablePeerAccess (0, 0);
+    cudaMalloc (&pointers[1], size);
+
+    cudaEvent_t begin, end;
+    cudaEventCreate (&begin);
+    cudaEventCreate (&end);
+
+    cudaEventRecord (begin);
+    cudaMemcpyAsync (pointers[0], pointers[1], size, cudaMemcpyDeviceToDevice);
+    cudaEventRecord (end);
+    cudaEventSynchronize (end);
+
+    float elapsed;
+    cudaEventElapsedTime (&elapsed, begin, end);
+    elapsed /= 1000;
+
+    cudaSetDevice (0);
+    cudaFree (pointers[0]);
+
+    cudaSetDevice (1);
+    cudaFree (pointers[1]);
+
+    cudaEventDestroy (end);
+    cudaEventDestroy (begin);
+
+    return elapsed;
 }
 
-double sin(double x) {
-    return x/100;
+void test() {
+    std::vector<std::thread> threads;
+
+    cudaSetDevice(0);
+    NaNL::Matrix<int, NaNL::DeviceMemoryBlock, NaNL::Unaligned> A(10000,10000);
+    auto x = A.copyTo<NaNL::DeviceMemoryBlock, NaNL::Unaligned>();
+
+
+
+    p2p_copy(4000);
+
+    threads.emplace_back([&] {
+        // cuda initializer
+        cudaSetDevice(0);
+        cudaDeviceEnablePeerAccess(1, 0);
+        NaNL::Matrix<int, NaNL::PinnedMemoryBlock, NaNL::Unaligned> m(10000, 10000);
+
+        DWORD threadId = GetCurrentThreadId();
+        NaNL::Logger* logger = NaNL::Logger::GetInstance();
+        logger->begin(threadId, "3080-Ti", "");
+
+        for(uint64_t i = 0; i < 100; i++) {
+            m.add<NaNL::PinnedMemoryBlock, NaNL::Unaligned>(A, NaNL::MatrixAddOperation::Cuda);
+        }
+
+        logger->end(threadId);
+        logger->log(threadId);
+    });
+
+    threads.emplace_back([&] {
+        // cuda initializer
+        cudaSetDevice(1);
+        cudaDeviceEnablePeerAccess(0, 0);
+        NaNL::Matrix<int, NaNL::PinnedMemoryBlock, NaNL::Unaligned> m(10000, 10000);
+
+        DWORD threadId = GetCurrentThreadId();
+        NaNL::Logger* logger = NaNL::Logger::GetInstance();
+        logger->begin(threadId, "2080-Ti", "");
+
+        for(uint64_t i = 0; i < 100; i++) {
+            m.add<NaNL::PinnedMemoryBlock, NaNL::Unaligned>(A, NaNL::MatrixAddOperation::Cuda);
+        }
+
+        logger->end(threadId);
+        logger->log(threadId);
+    });
+
+
+    for(auto& thread : threads) {
+        thread.join();
+    }
 }
 
 int main() {
+    //test();
+
+
+
 
     double k = 200.0;
     std::cout << sin(k) << std::endl;
+
+    DWORD threadId = GetCurrentThreadId();
+    NaNL::Logger* logger = NaNL::Logger::GetInstance();
+    logger->begin(threadId, "File Loader test", "");
+
+    NaNL::Matrix<uint64_t, NaNL::PagedMemoryBlock, NaNL::TensorCoreAligned32> u(2,2);
+    u[0][0] = 5;
+    u[0][1] = 9;
+    u[1][0] = 4;
+    u[1][1] = 3;
+
+    auto c = u.add<NaNL::PagedMemoryBlock, NaNL::Unaligned>(u);
+
+    for(uint64_t i = 0; i < c.getRows(); i++) {
+        for(uint64_t j = 0; j < c.getCols(); j++) {
+            std::cout << c[i][j] << std::endl;
+        }
+    }
+
 
 
 
@@ -48,11 +154,11 @@ int main() {
 
    // std::cout << sizeof(size_t) << std::endl;
 
-    NaNL::Matrix<int, NaNL::PagedMemoryBlock, NaNL::TensorCoreAligned32> x(100, 100);
-
-    NaNL::Matrix<int, NaNL::PagedMemoryBlock, NaNL::Unaligned> y(test());
-
-    std::cout << y[0][100] << std::endl;
+//    NaNL::Matrix<int, NaNL::PagedMemoryBlock, NaNL::TensorCoreAligned32> x(100, 100);
+//
+//    NaNL::Matrix<int, NaNL::PagedMemoryBlock, NaNL::Unaligned> y(100, 100);
+//
+//    std::cout << y[0][100] << std::endl;
 
 
 //    NaNL::Matrix<int, NaNL::PinnedMemoryBlock, NaNL::Unaligned> b(100, 100);

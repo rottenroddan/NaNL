@@ -9,6 +9,7 @@
 #define INT_MAX 2147483647
 #endif
 
+#include "../CudaUtil/CudaUtil.cuh"
 #include "../Alignment/Unaligned.cuh"
 #include "../MemoryBlock/PagedMemoryBlock.cuh"
 #include "../MemoryBlock/PinnedMemoryBlock.cuh"

@@ -30,7 +30,12 @@ namespace NaNL {
      * @param ptr_ Pointer to the address to free.
      */
     template<typename T>
-    inline void _freeDeviceMemory(T *ptr_) { cudaFree(ptr_); }
+    inline void _freeDeviceMemory(T *ptr_) {
+        cudaPointerAttributes attribute;
+        gpuErrchk(cudaPointerGetAttributes(&attribute, ptr_));
+        cudaSetDevice(attribute.device);
+        cudaFree(ptr_);
+    }
 }
 
 #endif

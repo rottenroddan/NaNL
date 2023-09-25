@@ -7,7 +7,7 @@
 #define NANL_MATRIXFILELOADER_CUH
 
 #include "../../BaseMatrix/BaseMatrix.cuh"
-#include "Matrix.cuh"
+//#include "Matrix.cuh"
 
 #include <deque>
 #include <fstream>

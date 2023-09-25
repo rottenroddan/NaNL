@@ -6,6 +6,9 @@
 #pragma once
 
 namespace NaNL {
+    Logger *Logger::instance = nullptr;
+    std::mutex Logger::mutex;
+
     namespace {
         double calculateTimePercentage(std::chrono::time_point<std::chrono::steady_clock> totalStartTime,
                                        std::chrono::time_point<std::chrono::steady_clock> totalEndTime,
