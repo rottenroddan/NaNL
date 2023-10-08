@@ -5,9 +5,9 @@
 #include "TestMatrices.cuh"
 
 TestMatrices::TestMatrices(std::string filePath) : fileLoader(filePath),
-    a(fileLoader.readValuesIntoMatrix<int>()),
-    b(fileLoader.readValuesIntoMatrix<int>()),
-    truth(fileLoader.readValuesIntoMatrix<int>())
+    a(fileLoader.read<int , NaNL::PagedMemoryBlock, NaNL::Unaligned>()),
+    b(fileLoader.read<int, NaNL::PagedMemoryBlock, NaNL::Unaligned>()),
+    truth(fileLoader.read<int, NaNL::PagedMemoryBlock, NaNL::Unaligned>())
 {
 
 }

@@ -8,10 +8,10 @@
 
 #include <string>
 #include <Matrix.cuh>
-#include <MatrixFileLoader.cuh>
+#include <MatrixInBinaryFileLoader.cuh>
 
 class TestMatrices {
-    MatrixFileLoader fileLoader;
+    NaNL::MatrixInBinaryFileLoader fileLoader;
     NaNL::Matrix<int> a;
     NaNL::Matrix<int> b;
     NaNL::Matrix<int> truth;

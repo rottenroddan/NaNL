@@ -6,7 +6,7 @@
 #define EMPTY_CU
 
 //#include "ThreadPool/ThreadPool.cuh"
-#include "Logger/Logger.cuh"
+//#include "Logger/Logger.cu"
 #include "CudaUtil/CudaUtil.cuh"
 #include "Kernels/MatrixKernels.cuh"
 #include "Alignment/BaseAlignment.cuh"
@@ -23,5 +23,7 @@
 #include "BaseMatrix/BaseMatrix.cuh"
 #include "Matrix/Matrix.cuh"
 #include "Matrix/MatrixUtility/MatrixTypeTraits.cuh"
+#include "MatrixInBinaryFileLoader.cuh"
+#include "MatrixOutBinaryFileLoader.cuh"
 
 #endif

@@ -17,6 +17,11 @@ namespace NaNL {
         }
 
         template<typename T, typename Alignment>
+        T* HostMemoryBlock<T,Alignment>::operator[](uint64_t i) const noexcept {
+            return &this->_matrix[i * this->actualCols];
+        }
+
+        template<typename T, typename Alignment>
         T HostMemoryBlock<T,Alignment>::get(uint64_t i, uint64_t j) const {
             if(i > this->rows || j > this->cols) {
                 // TODO: Throw exception here

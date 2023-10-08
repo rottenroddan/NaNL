@@ -10,7 +10,7 @@ namespace NaNL {
     Internal::HostMemoryBlock<T, Alignment>(rows, cols, Internal::MemoryTypes::CudaPinned)
     {
         T *_pinnedArr;
-        gpuErrchk(cudaMallocHost((void **) &_pinnedArr, rows * cols * sizeof(T)));
+        gpuErrchk(cudaMallocHost((void **) &_pinnedArr, this->actualRows * this->actualCols * sizeof(T)));
         this->_matrix = std::unique_ptr<T[], void (*)(T*)>(_pinnedArr, _freePinnedMemory);
     }
 } // NaNL

@@ -5,7 +5,6 @@
 #ifndef NANL_LOGGER_CUH
 #define NANL_LOGGER_CUH
 
-
 #include <iomanip>
 #include <iostream>
 #include <mutex>
@@ -43,17 +42,20 @@ namespace NaNL {
         // remove since singleton
         Logger(Logger &other) = delete;
 
-        void operator=(const Logger&) = delete;
+        void operator=(const Logger &) = delete;
 
-        inline static Logger* GetInstance();
-        inline void begin(int64_t _threadId, std::string _function, std::string _description);
-        inline void record(int64_t _threadId, std::string _function, std::string _description);
-        inline void end(int64_t _threadId);
-        inline void log(int64_t _threadId);
+        static Logger *GetInstance();
+
+        void begin(int64_t _threadId, std::string _function, std::string _description);
+
+        void record(int64_t _threadId, std::string _function, std::string _description);
+
+        void end(int64_t _threadId);
+
+        void log(int64_t _threadId);
     };
 }
 
-#include "Logger.cu"
 
 #ifdef PERFORMANCE_LOGGING
 #define PERFORMANCE_LOGGING_BEGIN \

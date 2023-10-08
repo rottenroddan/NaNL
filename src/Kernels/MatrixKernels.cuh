@@ -13,7 +13,14 @@
 
 namespace NaNL::Internal::Kernels {
     template<typename T>
-    __global__ void deviceAddMatrices(const T *_dev_a, const T *_dev_b, T *_dev_c, unsigned long mSize);
+    __global__ void deviceAddMatrices(const T *_dev_a, const T *_dev_b, T *_dev_c, uint64_t mSize);
+
+    template<typename T>
+    __global__ void
+    deviceAddMatricesWithOffset(const T *_dev_a, const T *_dev_b, T *_dev_c, uint64_t mSize,
+                                uint64_t rowSize, uint64_t colSize,
+                                uint64_t aOffset, uint64_t bOffset,
+                                uint64_t cOffset);
 
     template<typename T, typename U>
     __global__ void deviceMatrixCast(T *_dev_a, U *_dev_b, unsigned long mSize);

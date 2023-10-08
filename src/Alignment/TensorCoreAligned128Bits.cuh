@@ -11,8 +11,8 @@ namespace NaNL::Internal {
     protected:
         static constexpr uint64_t TOTAL_TENSOR_BIT_ALIGNMENT = 128;
     public:
-        inline TensorCoreAligned128Bits(uint64_t rows, uint64_t cols);
-        inline void align(uint64_t rows, uint64_t cols, uint64_t multiple);
+        inline TensorCoreAligned128Bits(uint64_t rows, uint64_t cols, uint64_t multiple);
+        //inline void align(uint64_t rows, uint64_t cols, uint64_t multiple);
     };
 }
 

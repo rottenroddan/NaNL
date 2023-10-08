@@ -6,6 +6,7 @@
 
 MatrixFileLoader::MatrixFileLoader(const std::string& file)  {
     this->file.open(file);
+    //this->file.sync_with_stdio(0);
 
     if(this->file.fail()) {
         // TODO: provide functionality

@@ -21,3 +21,10 @@ target_link_libraries(Performance-Testing PUBLIC Matrix)
 
 add_compile_definitions(PERFORMANCE_LOGGING)
 
+add_custom_command(
+        TARGET Performance-Testing PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_CURRENT_SOURCE_DIR}/data/
+        ${PROJECT_BINARY_DIR}/data/
+)
+

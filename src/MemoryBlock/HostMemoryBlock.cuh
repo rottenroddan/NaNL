@@ -25,6 +25,8 @@ namespace NaNL {
              */
             inline T *operator[](uint64_t i) noexcept;
 
+            inline T *operator[](uint64_t i) const noexcept;
+
             /**
              * Returns the value associated at the ith and jth position.
              * @param i Index of the row.
