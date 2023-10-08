@@ -12,6 +12,11 @@ include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 #file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/data/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/data/ )
 
 file(GLOB BASE_MATRIX_TEST_SRC CONFIGURE_DEPENDS "tests/Matrix/*/*TestSuite.cu")
+
+
+set(MATRIX_DATA_MANIP_TESTS "tests/Matrix/MatrixDataManipulationSuite/MatrixPagedCopySuite/MatrixPagedCopyTest.cu")
+set(MATRIX_DATA_MANIP_SOURCE ${MATRIX_DATA_MANIP_TESTS})
+
 #file(GLOB MATRIX_ARITHMETIC_TEST_SRC CONFIGURE_DEPENDS "tests/Matrix/MatrixArithmeticSuites/*/*Test.cu")
 
 
@@ -26,6 +31,12 @@ file(GLOB BASE_MATRIX_TEST_SRC CONFIGURE_DEPENDS "tests/Matrix/*/*TestSuite.cu")
 add_executable(Tests
         ${BASE_MATRIX_TEST_SRC}
         tests/Matrix/MatrixArithmeticSuites/MatrixArithmeticRunner/MatrixArithmeticRunner.cu
+        tests/Matrix/MatrixDataManipulationSuite/MatrixPagedCopySuite/MatrixPagedCopySuite.cu
+        tests/Matrix/MatrixDataManipulationSuite/MatrixPagedCopySuite/MatrixPagedCopyTest.cu
+        tests/Matrix/MatrixDataManipulationSuite/MatrixPinnedCopySuite/MatrixPinnedCopySuite.cu
+        tests/Matrix/MatrixDataManipulationSuite/MatrixPinnedCopySuite/MatrixPinnedCopyTest.cu
+        tests/Matrix/MatrixDataManipulationSuite/MatrixDeviceMoveSuite/MatrixDeviceMoveSuite.cu
+        tests/Matrix/MatrixDataManipulationSuite/MatrixDeviceMoveSuite/MatrixDeviceMoveTest.cu
         tests/MatrixTestLoaderSuite.cu
         tests/ThreadPoolTestSuite.cu)
 

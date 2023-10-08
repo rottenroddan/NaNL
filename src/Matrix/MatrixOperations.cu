@@ -64,12 +64,6 @@ namespace NaNL {
                 IsDerivedFromDeviceMemoryBlock<T, uMemory, uAlignment> &&
                 IsDerivedFromDeviceMemoryBlock<T, rMemory, rAlignment> {
 
-            // fetch current cuda device number. Set device to a.
-//            int deviceNum;
-//            gpuErrchk(cudaGetDevice(&deviceNum));
-//            const int currentCudaDevice = deviceNum;
-//            cudaSetDevice(a.getCudaDevice());
-
             int currentDevice;
             cudaGetDevice(&currentDevice);
 
@@ -77,8 +71,8 @@ namespace NaNL {
             const T *_b = b.getMatrix();
             T *_c = c.getMatrix();
 
-            dim3 threadsPerBlock(1024);
-            dim3 numBlocks(std::ceil((double)a.getActualTotalSize() / (double)threadsPerBlock.x));
+            dim3 threadsPerBlock(512);
+
 
             //
             if(a.getCudaDevice() != currentDevice && b.getCudaDevice() != currentDevice) {
@@ -86,20 +80,58 @@ namespace NaNL {
                 auto bb = b.template copyTo<Memory, Alignment>();
                 _a = aa.getMatrix();
                 _b = bb.getMatrix();
-                Internal::Kernels::deviceAddMatrices<<<numBlocks, threadsPerBlock>>>(_a, _b, _c, a.getActualTotalSize());
+                if(aa.getActualRows() == bb.getActualRows() &&
+                        aa.getActualCols() == bb.getActualCols() &&
+                        bb.getActualRows() == c.getActualRows() &&
+                        bb.getActualCols() == c.getActualCols()) {
+                    dim3 numBlocks(std::ceil((double)a.getActualTotalSize() / (double)threadsPerBlock.x));
+                    Internal::Kernels::deviceAddMatrices<<<numBlocks, threadsPerBlock>>>(_a, _b, _c, a.getActualTotalSize());
+                } else {
+                    dim3 numBlocks(std::ceil((double)a.getTotalSize() / (double)threadsPerBlock.x));
+                    Internal::Kernels::deviceAddMatricesWithOffset<<<numBlocks, threadsPerBlock>>>(_a, _b, _c, aa.getTotalSize(), aa.getRows(), aa.getCols(), aa.getActualCols(), bb.getActualCols(), c.getActualCols());
+                }
                 gpuErrchk(cudaDeviceSynchronize());
             } else if(a.getCudaDevice() != currentDevice) {
                 auto aa = a.template copyTo<Memory, Alignment>();
                 _a = aa.getMatrix();
-                Internal::Kernels::deviceAddMatrices<<<numBlocks, threadsPerBlock>>>(_a, _b, _c, a.getActualTotalSize());
+                if(aa.getActualRows() == b.getActualRows() &&
+                   aa.getActualCols() == b.getActualCols() &&
+                   b.getActualRows() == c.getActualRows() &&
+                   b.getActualCols() == c.getActualCols()) {
+                    dim3 numBlocks(std::ceil((double) a.getActualTotalSize() / (double) threadsPerBlock.x));
+                    Internal::Kernels::deviceAddMatrices<<<numBlocks, threadsPerBlock>>>(_a, _b, _c, a.getActualTotalSize());
+                } else {
+                    dim3 numBlocks(std::ceil((double)a.getTotalSize() / (double)threadsPerBlock.x));
+                    Internal::Kernels::deviceAddMatricesWithOffset<<<numBlocks, threadsPerBlock>>>(_a, _b, _c, a.getTotalSize(), a.getRows(), a.getCols(), aa.getActualCols(), b.getActualCols(), c.getActualCols());
+                }
                 gpuErrchk(cudaDeviceSynchronize());
             } else if(b.getCudaDevice() != currentDevice) {
                 auto bb = b.template copyTo<Memory, Alignment>();
                 _b = bb.getMatrix();
-                Internal::Kernels::deviceAddMatrices<<<numBlocks, threadsPerBlock>>>(_a, _b, _c, a.getActualTotalSize());
+                if(a.getActualRows() == bb.getActualRows() &&
+                   a.getActualCols() == bb.getActualCols() &&
+                   bb.getActualRows() == c.getActualRows() &&
+                   bb.getActualCols() == c.getActualCols()) {
+                    dim3 numBlocks(std::ceil((double) a.getActualTotalSize() / (double) threadsPerBlock.x));
+                    Internal::Kernels::deviceAddMatrices<<<numBlocks, threadsPerBlock>>>(_a, _b, _c, a.getActualTotalSize());
+                } else {
+                    dim3 numBlocks(std::ceil((double)a.getTotalSize() / (double)threadsPerBlock.x));
+                    Internal::Kernels::deviceAddMatricesWithOffset<<<numBlocks, threadsPerBlock>>>(_a, _b, _c, a.getTotalSize(), a.getRows(), a.getCols(), a.getActualCols(), bb.getActualCols(), c.getActualCols());
+                }
                 gpuErrchk(cudaDeviceSynchronize());
             } else {
-                Internal::Kernels::deviceAddMatrices<<<numBlocks, threadsPerBlock>>>(_a, _b, _c, a.getActualTotalSize());
+                if(a.getActualRows() == b.getActualRows() &&
+                   a.getActualCols() == b.getActualCols() &&
+                   b.getActualRows() == c.getActualRows() &&
+                   b.getActualCols() == c.getActualCols()) {
+                    dim3 numBlocks(std::ceil((double) a.getActualTotalSize() / (double) threadsPerBlock.x));
+                    Internal::Kernels::deviceAddMatrices<<<numBlocks, threadsPerBlock>>>(_a, _b, _c, a.getActualTotalSize());
+                } else {
+                    dim3 numBlocks(std::ceil((double)a.getTotalSize() / (double)threadsPerBlock.x));
+                    Internal::Kernels::deviceAddMatricesWithOffset<<<numBlocks, threadsPerBlock>>>(_a, _b, _c, a.getTotalSize(), a.getRows(), a.getCols(), a.getActualCols(), b.getActualCols(), c.getActualCols());
+
+                    gpuErrchk(cudaPeekAtLastError());
+                }
                 gpuErrchk(cudaDeviceSynchronize());
             }
         }

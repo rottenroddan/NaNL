@@ -1,16 +1,11 @@
 //
-// Created by steve on 8/11/2023.
+// Created by steve on 9/29/2023.
 //
 
-#include "gtest/gtest.h"
-#include <Matrix.cuh>
-#include <DeviceMemoryBlock.cuh>
-#include "MatrixCudaAddSuite.cuh"
-
-TEST_F(MatrixCudaAddSuite, Should_Add_Small_Matrices_To_Correct_Values_When_Paged_UnAligned) {
+TEST_F(MatrixCudaAddSuite, Should_Add_Small_Matrices_To_Correct_Values_When_Device_UnAligned) {
     try {
-        auto a = smallTestMatrices->getCopyOfA<NaNL::PagedMemoryBlock, NaNL::Unaligned>();
-        auto b = smallTestMatrices->getCopyOfB<NaNL::PagedMemoryBlock, NaNL::Unaligned>();
+        auto a = smallTestMatrices->getCopyOfA<NaNL::DeviceMemoryBlock, NaNL::Unaligned>();
+        auto b = smallTestMatrices->getCopyOfB<NaNL::DeviceMemoryBlock, NaNL::Unaligned>();
         auto truth = smallTestMatrices->getCopyOfTruth<NaNL::PagedMemoryBlock, NaNL::Unaligned>();
 
         auto startTime = std::chrono::high_resolution_clock::now();
@@ -37,10 +32,10 @@ TEST_F(MatrixCudaAddSuite, Should_Add_Small_Matrices_To_Correct_Values_When_Page
     }
 }
 
-TEST_F(MatrixCudaAddSuite, Should_Add_Medium_Matrices_To_Correct_Values_When_Paged_UnAligned) {
+TEST_F(MatrixCudaAddSuite, Should_Add_Medium_Matrices_To_Correct_Values_When_Device_UnAligned) {
     try {
-        auto a = mediumTestMatrices->getCopyOfA<NaNL::PagedMemoryBlock, NaNL::Unaligned>();
-        auto b = mediumTestMatrices->getCopyOfB<NaNL::PagedMemoryBlock, NaNL::Unaligned>();
+        auto a = mediumTestMatrices->getCopyOfA<NaNL::DeviceMemoryBlock, NaNL::Unaligned>();
+        auto b = mediumTestMatrices->getCopyOfB<NaNL::DeviceMemoryBlock, NaNL::Unaligned>();
         auto truth = mediumTestMatrices->getCopyOfTruth<NaNL::PagedMemoryBlock, NaNL::Unaligned>();
 
         auto startTime = std::chrono::high_resolution_clock::now();
@@ -67,10 +62,10 @@ TEST_F(MatrixCudaAddSuite, Should_Add_Medium_Matrices_To_Correct_Values_When_Pag
     }
 }
 
-TEST_F(MatrixCudaAddSuite, Should_Add_Large_Matrices_To_Correct_Values_When_Paged_UnAligned) {
+TEST_F(MatrixCudaAddSuite, Should_Add_Large_Matrices_To_Correct_Values_When_Device_UnAligned) {
     try {
-        auto a = largeTestMatrices->getCopyOfA<NaNL::PagedMemoryBlock, NaNL::Unaligned>();
-        auto b = largeTestMatrices->getCopyOfB<NaNL::PagedMemoryBlock, NaNL::Unaligned>();
+        auto a = largeTestMatrices->getCopyOfA<NaNL::DeviceMemoryBlock, NaNL::Unaligned>();
+        auto b = largeTestMatrices->getCopyOfB<NaNL::DeviceMemoryBlock, NaNL::Unaligned>();
         auto truth = largeTestMatrices->getCopyOfTruth<NaNL::PagedMemoryBlock, NaNL::Unaligned>();
 
         auto startTime = std::chrono::high_resolution_clock::now();

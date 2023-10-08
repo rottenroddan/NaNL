@@ -14,6 +14,9 @@
 
 // cuda operations
 #include "../MatrixCudaAddSuite/MatrixPagedUnalignedCudaAddTest.cu"
+#include "../MatrixCudaAddSuite/MatrixPinnedUnalignedCudaAddTest.cu"
+#include "../MatrixCudaAddSuite/MatrixDeviceUnalignedCudaAddTest.cu"
+#include "../MatrixCudaAddSuite/MatrixPagedTensorAligned32CudaAddTest.cu"
 
 // multi-gpu tests
 #include "../MatrixMultiCudaAddSuite/MatrixMultiCudaAddTest.cu"

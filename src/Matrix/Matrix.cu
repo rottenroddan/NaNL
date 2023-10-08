@@ -220,12 +220,14 @@ namespace NaNL {
                 gpuErrchk(cudaGetDevice(&currentDevice));
                 if(this->getCudaDevice() != currentDevice) {
                     Matrix<T, rMemory, rAlignment> movedMatrix(this->getRows(), this->getCols());
-                    if(this->getActualRows() == movedMatrix.getActualCols()
+                    if(this->getActualRows() == movedMatrix.getActualRows()
                        && this->getActualCols() == movedMatrix.getActualCols()) {
                         cudaMemcpyPeer(movedMatrix.getMatrix(), movedMatrix.getCudaDevice(), this->getMatrix(), this->getCudaDevice(), sizeof(T) * this->getActualTotalSize());
                     } else {
                         for(uint64_t i = 0; i < this->getRows(); i++) {
-                            gpuErrchk(cudaMemcpyPeer(movedMatrix.getMatrix(), movedMatrix.getCudaDevice(), this->getMatrix(), this->getCudaDevice(), sizeof(T) * this->getActualTotalSize()));
+                            gpuErrchk(cudaMemcpyPeer(movedMatrix.getMatrix() + movedMatrix.getActualCols() * i, movedMatrix.getCudaDevice(),
+                                                     this->getMatrix() + this->getActualCols() * i, this->getCudaDevice(),
+                                                     sizeof(T) * this->getCols()));
                         }
                     }
                     return movedMatrix;
@@ -259,7 +261,7 @@ namespace NaNL {
                 cudaMemcpy(movedMatrix.getMatrix(), this->getMatrix(), sizeof(T) * this->getActualTotalSize(), cudaMemcpyHostToDevice);
             } else {
                 for(uint64_t i = 0; i < this->getRows(); i++) {
-                    gpuErrchk(cudaMemcpy(movedMatrix.getMatrix() + movedMatrix.getActualCols() * i, this->getMatrix() + this->getActualCols() * i, this->getActualCols() * sizeof(T), cudaMemcpyHostToDevice));
+                    gpuErrchk(cudaMemcpy(movedMatrix.getMatrix() + movedMatrix.getActualCols() * i, this->getMatrix() + this->getActualCols() * i, this->getCols() * sizeof(T), cudaMemcpyHostToDevice));
                 }
             }
 
@@ -274,7 +276,7 @@ namespace NaNL {
                 cudaMemcpy(movedMatrix.getMatrix(), this->getMatrix(), sizeof(T) * this->getActualTotalSize(), cudaMemcpyDeviceToHost);
             } else {
                 for(uint64_t i = 0; i < movedMatrix.getRows(); i++) {
-                    gpuErrchk(cudaMemcpy(movedMatrix.getMatrix() + movedMatrix.getActualCols() * i, this->getMatrix() + this->getActualCols() * i, this->getActualCols() * sizeof(T), cudaMemcpyDeviceToHost));
+                    gpuErrchk(cudaMemcpy(movedMatrix.getMatrix() + movedMatrix.getActualCols() * i, this->getMatrix() + this->getActualCols() * i, this->getCols() * sizeof(T), cudaMemcpyDeviceToHost));
                 }
             }
 
