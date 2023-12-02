@@ -12,7 +12,12 @@ namespace NaNL {
      * @param ptr_ Pointer to the address to free.
      */
     template<typename T>
-    inline void _freePagedMemory(T *ptr_) { delete[] ptr_; }
+    inline void _freePagedMemory(T *ptr_) {
+        //delete[] ptr_;
+
+        _aligned_free(ptr_);
+    }
+
 
     /**
      * Function that frees pinned memory from the pointer provided.

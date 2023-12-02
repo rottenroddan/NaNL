@@ -126,18 +126,37 @@ int main() {
     u[1][0] = 4;
     u[1][1] = 3;
 
-    auto c = u.add<NaNL::PagedMemoryBlock, NaNL::Unaligned>(u, NaNL::MatrixAddOperation::Cuda);
+    auto c = u.add<NaNL::PagedMemoryBlock, NaNL::TensorCoreAligned32>(u, NaNL::MatrixAddOperation::Host);
 
     for(uint64_t i = 0; i < c.getRows(); i++) {
         for(uint64_t j = 0; j < c.getCols(); j++) {
             std::cout << c[i][j] << std::endl;
         }
     }
-
-
-
     DWORD threadId = GetCurrentThreadId();
     NaNL::Logger* logger = NaNL::Logger::GetInstance();
+
+
+    using type = int;
+    NaNL::Matrix<type, NaNL::PagedMemoryBlock, NaNL::Unaligned> a(24000, 24000);
+    NaNL::Matrix<type, NaNL::PagedMemoryBlock, NaNL::Unaligned> b(24000, 24000);
+
+
+    logger->begin(threadId, "AVX", "");
+    for(int i = 0; i < 25; i++) {
+        a.add<NaNL::PagedMemoryBlock, NaNL::Unaligned>(b, NaNL::MatrixAddOperation::Host);
+    }
+    logger->end(threadId);
+    logger->log(threadId);
+
+    logger->begin(threadId, "Non-AVX", "");
+    for(int i = 0; i < 25; i++) {
+        a.add<NaNL::PagedMemoryBlock, NaNL::TensorCoreAligned32>(b, NaNL::MatrixAddOperation::Host);
+    }
+    logger->end(threadId);
+    logger->log(threadId);
+
+
     logger->begin(threadId, "Cuda No alignment difference", "");
 
     NaNL::Matrix<int, NaNL::PagedMemoryBlock, NaNL::TensorCoreAligned32> aa(24000, 24000);

@@ -10,7 +10,7 @@
 #endif
 
 #include "../CudaUtil/CudaUtil.cuh"
-#include "../Alignment/Unaligned.cuh"
+#include "../Padding//Unaligned.cuh"
 #include "../MemoryBlock/PagedMemoryBlock.cuh"
 #include "../MemoryBlock/PinnedMemoryBlock.cuh"
 #include "../MemoryBlock/DeviceMemoryBlock.cuh"

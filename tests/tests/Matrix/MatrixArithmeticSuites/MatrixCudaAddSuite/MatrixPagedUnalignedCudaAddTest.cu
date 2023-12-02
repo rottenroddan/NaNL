@@ -17,12 +17,6 @@ TEST_F(MatrixCudaAddSuite, Should_Add_Small_Matrices_To_Correct_Values_When_Page
 
         auto c = a.add<NaNL::PagedMemoryBlock, NaNL::Unaligned>(b, NaNL::MatrixAddOperation::Cuda);
 
-        auto endTime = std::chrono::high_resolution_clock::now();
-        auto elapsedTimeMicro = std::chrono::duration_cast<std::chrono::microseconds>(endTime-startTime).count();
-        auto elapsedTimeSeconds = std::chrono::duration_cast<std::chrono::milliseconds>(endTime-startTime).count();
-
-        std::cout << "CudaAdd time: " << std::setw(9) << std::right << elapsedTimeMicro << "μs. ("<< std::left << std::setw(7)  << elapsedTimeSeconds / 1000.0 << "s. )"<< std::endl;
-
         ASSERT_EQ(c.getRows(), truth.getRows());
         ASSERT_EQ(c.getCols(), truth.getCols());
 
@@ -47,12 +41,6 @@ TEST_F(MatrixCudaAddSuite, Should_Add_Medium_Matrices_To_Correct_Values_When_Pag
 
         auto c = a.add<NaNL::PagedMemoryBlock, NaNL::Unaligned>(b, NaNL::MatrixAddOperation::Cuda);
 
-        auto endTime = std::chrono::high_resolution_clock::now();
-        auto elapsedTimeMicro = std::chrono::duration_cast<std::chrono::microseconds>(endTime-startTime).count();
-        auto elapsedTimeSeconds = std::chrono::duration_cast<std::chrono::milliseconds>(endTime-startTime).count();
-
-        std::cout << "CudaAdd time: " << std::setw(9) << std::right << elapsedTimeMicro << "μs. ("<< std::left << std::setw(7)  << elapsedTimeSeconds / 1000.0 << "s. )"<< std::endl;
-
         ASSERT_EQ(c.getRows(), truth.getRows());
         ASSERT_EQ(c.getCols(), truth.getCols());
 
@@ -76,12 +64,6 @@ TEST_F(MatrixCudaAddSuite, Should_Add_Large_Matrices_To_Correct_Values_When_Page
         auto startTime = std::chrono::high_resolution_clock::now();
 
         auto c = a.add<NaNL::PagedMemoryBlock, NaNL::Unaligned>(b, NaNL::MatrixAddOperation::Cuda);
-
-        auto endTime = std::chrono::high_resolution_clock::now();
-        auto elapsedTimeMicro = std::chrono::duration_cast<std::chrono::microseconds>(endTime-startTime).count();
-        auto elapsedTimeSeconds = std::chrono::duration_cast<std::chrono::milliseconds>(endTime-startTime).count();
-
-        std::cout << "CudaAdd time: " << std::setw(9) << std::right << elapsedTimeMicro << "μs. ("<< std::left << std::setw(7)  << elapsedTimeSeconds / 1000.0 << "s. )"<< std::endl;
 
         ASSERT_EQ(c.getRows(), truth.getRows());
         ASSERT_EQ(c.getCols(), truth.getCols());

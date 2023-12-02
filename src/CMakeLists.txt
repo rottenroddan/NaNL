@@ -29,6 +29,7 @@ set_target_properties(Matrix PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 
 # set(SOURCE_FILES Matrix_Impl/BaseMatrix.cu Matrix_Impl/Matrix.cu Matrix_Impl/MatrixFileLoader.cu)
 set_property(TARGET Matrix PROPERTY CUDA_ARCHITECTURES 80)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /O2")
 
 #if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 #    target_compile_options(pybind11 INTERFACE -fsized-deallocation)
@@ -36,7 +37,7 @@ set_property(TARGET Matrix PROPERTY CUDA_ARCHITECTURES 80)
 
 target_include_directories(Matrix PUBLIC ${CUDA_INCLUDE_DIRS}
         Kernels
-        Alignment
+        Padding
         Matrix
         Matrix/MatrixFileLoader
         Matrix/MatrixUtility

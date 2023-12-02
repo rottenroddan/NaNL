@@ -21,51 +21,62 @@ namespace NaNL {
     concept IsDerivedFromHostMemoryBlock = std::is_base_of_v<NaNL::Internal::HostMemoryBlock<T, V>, U<T, V>>;
 
     template<class T, template<class, class> class Memory = NaNL::PagedMemoryBlock,
-            class Alignment = NaNL::Unaligned>
-    class Matrix : public BaseMatrix<T, Memory, Alignment> {
+            class Padding = NaNL::Unaligned>
+    class Matrix : public BaseMatrix<T, Memory, Padding> {
     protected:
+
+
         mutable std::shared_mutex _shared_mutex;
     public:
+//        template<template<class, class> class uMemory, class uPadding,
+//                template<class, class> class rMemory, class rPadding>
+//        static void _addMatricesOnCuda(const Matrix<T, Memory, Padding> &a,
+//                                       const Matrix<T, uMemory, uPadding> &b,
+//                                       Matrix<T, rMemory, rPadding> &c) requires
+//        IsDerivedFromDeviceMemoryBlock<T, Memory, Padding> &&
+//        IsDerivedFromDeviceMemoryBlock<T, uMemory, uPadding> &&
+//        IsDerivedFromDeviceMemoryBlock<T, rMemory, rPadding>;
+
         inline Matrix(uint64_t rows, uint64_t cols);
 
-        inline Matrix(const Matrix<T, Memory, Alignment> &copyMatrix) noexcept;
+        inline Matrix(const Matrix<T, Memory, Padding> &copyMatrix) noexcept;
 
-        inline Matrix(Matrix<T, Memory, Alignment> &&copyMatrix) noexcept;
+        inline Matrix(Matrix<T, Memory, Padding> &&copyMatrix) noexcept;
 
-        inline Matrix<T, Memory, Alignment> &operator=(const Matrix<T, Memory, Alignment> &rhs);
+        inline Matrix<T, Memory, Padding> &operator=(const Matrix<T, Memory, Padding> &rhs);
 
-        inline Matrix<T, Memory, Alignment> &operator=(Matrix<T, Memory, Alignment> &&rhs) noexcept = default;
+        inline Matrix<T, Memory, Padding> &operator=(Matrix<T, Memory, Padding> &&rhs) noexcept = default;
 
         inline std::shared_mutex& getMutex() const;
 
-        template<template<class, class> class rMemory, class rAlignment, class R = T>
-        inline Matrix<R, rMemory, rAlignment> copyTo() const;
+        template<template<class, class> class rMemory, class rPadding, class R = T>
+        inline Matrix<R, rMemory, rPadding> copyTo() const;
 
-//        template<template<class, class> class rMemory, class rAlignment, class R = T>
-//        inline Matrix<R, rMemory, rAlignment> copyToCast() const;
+//        template<template<class, class> class rMemory, class rPadding, class R = T>
+//        inline Matrix<R, rMemory, rPadding> copyToCast() const;
 
-        template<template<class, class> class rMemory, class rAlignment>
-        inline Matrix<T, rMemory, rAlignment> moveTo() const &&;
+        template<template<class, class> class rMemory, class rPadding>
+        inline Matrix<T, rMemory, rPadding> moveTo() const &&;
 
-        template<template<class, class> class rMemory, class rAlignment,
-                template<class, class> class uMemory, class uAlignment>
-        inline Matrix<T, rMemory, rAlignment>
-        add(const Matrix<T, uMemory, uAlignment> &b, MatrixAddOperation device = MatrixAddOperation::Host);
-//        template<template<typename> class rMemory, template<class, template<typename> class> class rAlignment>
-//        inline Matrix<T, rMemory, rAlignment> add(const Matrix<T, PinnedMemoryBlock, Unaligned> &b, MatrixDeviceOperation device = MatrixDeviceOperation::Host);
+        template<template<class, class> class rMemory, class rPadding,
+                template<class, class> class uMemory, class uPadding>
+        inline Matrix<T, rMemory, rPadding>
+        add(const Matrix<T, uMemory, uPadding> &b, MatrixAddOperation device = MatrixAddOperation::Host);
+//        template<template<typename> class rMemory, template<class, template<typename> class> class rPadding>
+//        inline Matrix<T, rMemory, rPadding> add(const Matrix<T, PinnedMemoryBlock, Unaligned> &b, MatrixDeviceOperation device = MatrixDeviceOperation::Host);
 
-        template<template<class, class> class rMemory, class rAlignment,
-                template<class, class> class uMemory, class uAlignment>
-        static Matrix<T, rMemory, rAlignment>
-        addHost(const Matrix<T, Memory, Alignment> &a, const Matrix<T, uMemory, uAlignment> &b);
+        template<template<class, class> class rMemory, class rPadding,
+                template<class, class> class uMemory, class uPadding>
+        static Matrix<T, rMemory, rPadding>
+        addHost(const Matrix<T, Memory, Padding> &a, const Matrix<T, uMemory, uPadding> &b);
 
-        template<template<class, class> class rMemory, class rAlignment,
-                template<class, class> class uMemory, class uAlignment>
-        static Matrix<T, rMemory, rAlignment>
-        addCuda(const Matrix<T, Memory, Alignment> &a, const Matrix<T, uMemory, uAlignment> &b);
+        template<template<class, class> class rMemory, class rPadding,
+                template<class, class> class uMemory, class uPadding>
+        static Matrix<T, rMemory, rPadding>
+        addCuda(const Matrix<T, Memory, Padding> &a, const Matrix<T, uMemory, uPadding> &b);
 
-//        Matrix <T, rMemory, rAlignment>
-//        addCuda(const Matrix <T, Memory, Alignment> &a, const Matrix <T, uMemory, uAlignment> &b);
+//        Matrix <T, rMemory, rPadding>
+//        addCuda(const Matrix <T, Memory, Padding> &a, const Matrix <T, uMemory, uPadding> &b);
     };
 
 //    template<class T>

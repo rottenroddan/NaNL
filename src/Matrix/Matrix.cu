@@ -6,25 +6,27 @@
 
 namespace NaNL {
 //    template<class T, template<class, class> class Memory,
-//            class Alignment>
-//    Matrix<T, Memory, Alignment>::Matrix()
-//            : BaseMatrix<T, Memory, Alignment>(0, 0) {
+//            class Padding>
+//    Matrix<T, Memory, Padding>::Matrix()
+//            : BaseMatrix<T, Memory, Padding>(0, 0) {
 //
 //    }
 
+
+
     template<class T, template<class, class> class Memory,
-            class Alignment>
-    Matrix<T, Memory, Alignment>::Matrix(uint64_t rows, uint64_t cols)
-            : BaseMatrix<T, Memory, Alignment>(rows, cols) {
+            class Padding>
+    Matrix<T, Memory, Padding>::Matrix(uint64_t rows, uint64_t cols)
+            : BaseMatrix<T, Memory, Padding>(rows, cols) {
     }
 
-    template<class T, template<class, class> class Memory, class Alignment>
-    Matrix<T, Memory, Alignment>::Matrix(const Matrix<T, Memory, Alignment> &copyMatrix) noexcept
-            : BaseMatrix<T, Memory, Alignment>(copyMatrix.getRows(), copyMatrix.getCols()) {
+    template<class T, template<class, class> class Memory, class Padding>
+    Matrix<T, Memory, Padding>::Matrix(const Matrix<T, Memory, Padding> &copyMatrix) noexcept
+            : BaseMatrix<T, Memory, Padding>(copyMatrix.getRows(), copyMatrix.getCols()) {
         /*
          * TODO: Fix this method. Doesn't copy properly.
          */
-        if constexpr (Internal::is_matrix_derived_from_paged_or_pinned<T, Memory, Alignment>) {
+        if constexpr (Internal::is_matrix_derived_from_paged_or_pinned<T, Memory, Padding>) {
             for (uint64_t i = 0; i < this->rows; i++) {
                 for (uint64_t j = 0; j < this->cols; j++) {
                     this->operator[](i)[j] = copyMatrix.get(i, j);
@@ -35,31 +37,31 @@ namespace NaNL {
         }
     }
 
-    template<class T, template<class, class> class Memory, class Alignment>
-    Matrix<T, Memory, Alignment>::Matrix(Matrix<T, Memory, Alignment> &&copyMatrix) noexcept
-            : BaseMatrix<T, Memory, Alignment>(copyMatrix.rows, copyMatrix.cols) {
+    template<class T, template<class, class> class Memory, class Padding>
+    Matrix<T, Memory, Padding>::Matrix(Matrix<T, Memory, Padding> &&copyMatrix) noexcept
+            : BaseMatrix<T, Memory, Padding>(copyMatrix.rows, copyMatrix.cols) {
         this->_matrix = std::move(copyMatrix._matrix);
     }
 
     /*
      * TODO: provide implementation.
      */
-    template<class T, template<class, class> class Memory, class Alignment>
-    NaNL::Matrix<T, Memory, Alignment> &
-    NaNL::Matrix<T, Memory, Alignment>::Matrix::operator=(const Matrix<T, Memory, Alignment> &rhs) {
+    template<class T, template<class, class> class Memory, class Padding>
+    NaNL::Matrix<T, Memory, Padding> &
+    NaNL::Matrix<T, Memory, Padding>::Matrix::operator=(const Matrix<T, Memory, Padding> &rhs) {
         std::unique_lock<std::shared_mutex> lock(this->_shared_mutex);
         return *this;
     }
 
-//    template<class T, template<class, class> class Memory, class Alignment>
-//    template<template<class, class> class rMemory, class rAlignment>
-//    Matrix<T, rMemory, rAlignment> NaNL::Matrix<T, Memory, Alignment>::copyTo() const {
-//        Matrix<T, rMemory, rAlignment> copyMatrix(this->getRows(), this->getCols());
+//    template<class T, template<class, class> class Memory, class Padding>
+//    template<template<class, class> class rMemory, class rPadding>
+//    Matrix<T, rMemory, rPadding> NaNL::Matrix<T, Memory, Padding>::copyTo() const {
+//        Matrix<T, rMemory, rPadding> copyMatrix(this->getRows(), this->getCols());
 //        cudaMemcpyKind memcpyKind = cudaMemcpyHostToHost;
 //
 //        // host to host
-//        if constexpr(Internal::is_matrix_derived_from_paged_or_pinned<T, Memory, Alignment>
-//                        && Internal::is_matrix_derived_from_paged_or_pinned<T, rMemory, rAlignment>) {
+//        if constexpr(Internal::is_matrix_derived_from_paged_or_pinned<T, Memory, Padding>
+//                        && Internal::is_matrix_derived_from_paged_or_pinned<T, rMemory, rPadding>) {
 //            for (uint64_t i = 0; i < this->getRows(); i++) {
 //                for (uint64_t j = 0; j < this->getCols(); j++) {
 //                    copyMatrix[i][j] = this->get(i, j);
@@ -67,21 +69,21 @@ namespace NaNL {
 //            }
 //            return copyMatrix;
 //        } // host to device
-//        else if constexpr(Internal::is_matrix_derived_from_paged_or_pinned<T, Memory, Alignment>
-//                        && Internal::is_matrix_derived_from_device<T, rMemory, rAlignment>) {
+//        else if constexpr(Internal::is_matrix_derived_from_paged_or_pinned<T, Memory, Padding>
+//                        && Internal::is_matrix_derived_from_device<T, rMemory, rPadding>) {
 //            memcpyKind = cudaMemcpyHostToDevice;
 //        } // device to host
-//        else if constexpr(Internal::is_matrix_derived_from_device<T, Memory, Alignment>
-//                            && Internal::is_matrix_derived_from_paged_or_pinned<T, rMemory, rAlignment>) {
+//        else if constexpr(Internal::is_matrix_derived_from_device<T, Memory, Padding>
+//                            && Internal::is_matrix_derived_from_paged_or_pinned<T, rMemory, rPadding>) {
 //            memcpyKind = cudaMemcpyDeviceToHost;
 //        } // device to device
-//        else if constexpr(Internal::is_matrix_derived_from_device<T, Memory, Alignment>
-//                            && Internal::is_matrix_derived_from_device<T, rMemory, rAlignment>) {
+//        else if constexpr(Internal::is_matrix_derived_from_device<T, Memory, Padding>
+//                            && Internal::is_matrix_derived_from_device<T, rMemory, rPadding>) {
 //            memcpyKind = cudaMemcpyDeviceToDevice;
 //        }
 //
 //        // Perform copy based on kind of copy decided from above.
-//        // If the actual total size(for different alignments) is
+//        // If the actual total size(for different Paddings) is
 //        // the same, we can perform a 1:1 copy rather a loop-based
 //        // copy over.
 //        if (this->getActualRows() == copyMatrix.getActualRows()
@@ -102,20 +104,20 @@ namespace NaNL {
 //    }
 
 
-    template<class T, template<class, class> class Memory, class Alignment>
-    std::shared_mutex &Matrix<T, Memory, Alignment>::getMutex() const {
+    template<class T, template<class, class> class Memory, class Padding>
+    std::shared_mutex &Matrix<T, Memory, Padding>::getMutex() const {
         return this->_shared_mutex;
     }
 
-    template<class T, template<class, class> class Memory, class Alignment>
-    template<template<class, class> class rMemory, class rAlignment, class R>
-    Matrix<R, rMemory, rAlignment> NaNL::Matrix<T, Memory, Alignment>::copyTo() const {
+    template<class T, template<class, class> class Memory, class Padding>
+    template<template<class, class> class rMemory, class rPadding, class R>
+    Matrix<R, rMemory, rPadding> NaNL::Matrix<T, Memory, Padding>::copyTo() const {
         std::shared_lock<std::shared_mutex> lock(this->_shared_mutex);
-        Matrix<R, rMemory, rAlignment> copyMatrix(this->getRows(), this->getCols());
+        Matrix<R, rMemory, rPadding> copyMatrix(this->getRows(), this->getCols());
 
         // host to host
-        if constexpr(Internal::is_matrix_derived_from_paged_or_pinned<T, Memory, Alignment>
-                     && Internal::is_matrix_derived_from_paged_or_pinned<T, rMemory, rAlignment>) {
+        if constexpr(Internal::is_matrix_derived_from_paged_or_pinned<T, Memory, Padding>
+                     && Internal::is_matrix_derived_from_paged_or_pinned<T, rMemory, rPadding>) {
             for (uint64_t i = 0; i < this->getRows(); i++) {
                 for (uint64_t j = 0; j < this->getCols(); j++) {
                     // if R and T are same, no need to cast, pretty sure the compiler would recognize
@@ -130,74 +132,18 @@ namespace NaNL {
             }
             return copyMatrix;
         } // host to device
-        else if constexpr(Internal::is_matrix_derived_from_paged_or_pinned<T, Memory, Alignment>
-                          && Internal::is_matrix_derived_from_device<T, rMemory, rAlignment>) {
-            if (this->getActualRows() == copyMatrix.getActualRows()
-                && this->getActualCols() == copyMatrix.getActualCols()
-                && this->getActualTotalSize() == copyMatrix.getActualTotalSize()) {
-                if constexpr (std::is_same_v<T,R>) {
-                    cudaMemcpy(copyMatrix.getMatrix(), this->getMatrix(), this->getActualTotalSize() * sizeof(T),
-                               cudaMemcpyHostToDevice);
-                } else {
-                    auto castMatrix = this->copyTo<Memory, Alignment, R>();
-                    cudaMemcpy(copyMatrix.getMatrix(), castMatrix.getMatrix(), castMatrix.getActualTotalSize() * sizeof(R),
-                               cudaMemcpyHostToDevice);
-                }
-            } else {
-                if constexpr(std::is_same_v<T,R>) {
-                    for (uint64_t i = 0; i < copyMatrix.getRows(); i++) {
-                        gpuErrchk(cudaMemcpy(copyMatrix.getMatrix() + copyMatrix.getActualCols() * i,
-                                             this->getMatrix() + this->getActualCols() * i,
-                                             this->getCols() * sizeof(T),
-                                             cudaMemcpyHostToDevice));
-                    }
-                } else {
-                    auto castMatrix = this->copyTo<Memory, Alignment, R>();
-                    for (uint64_t i = 0; i < copyMatrix.getRows(); i++) {
-                        gpuErrchk(cudaMemcpy(copyMatrix.getMatrix() + copyMatrix.getActualCols() * i,
-                                             castMatrix.getMatrix() + castMatrix.getActualCols() * i,
-                                             castMatrix.getCols() * sizeof(R),
-                                             cudaMemcpyHostToDevice));
-                    }
-                }
-            }
+        else if constexpr(Internal::is_matrix_derived_from_paged_or_pinned<T, Memory, Padding>
+                          && Internal::is_matrix_derived_from_device<T, rMemory, rPadding>) {
+            return Internal::_copyHostToDevice<T, Memory, Padding, rMemory, rPadding, R>((Matrix<T, Memory, Padding> &)(*this));
         } // device to host
-        else if constexpr(Internal::is_matrix_derived_from_device<T, Memory, Alignment>
-                          && Internal::is_matrix_derived_from_paged_or_pinned<T, rMemory, rAlignment>) {
-            if (this->getActualRows() == copyMatrix.getActualRows()
-                && this->getActualCols() == copyMatrix.getActualCols()
-                && this->getActualTotalSize() == copyMatrix.getActualTotalSize()) {
-                if constexpr (std::is_same_v<T,R>) {
-                    cudaMemcpy(copyMatrix.getMatrix(), this->getMatrix(), this->getActualTotalSize() * sizeof(T),
-                               cudaMemcpyDeviceToHost);
-                } else {
-                    auto castMatrix = Internal::_castMatricesOnCuda<T, Memory, Alignment, R>(*this);
-                    cudaMemcpy(copyMatrix.getMatrix(), castMatrix.getMatrix(), castMatrix.getActualTotalSize() * sizeof(R),
-                               cudaMemcpyDeviceToHost);
-                }
-            } else {
-                if constexpr (std::is_same_v<T,R>) {
-                    for (uint64_t i = 0; i < copyMatrix.getRows(); i++) {
-                        gpuErrchk(cudaMemcpy(copyMatrix.getMatrix() + copyMatrix.getActualCols() * i,
-                                             this->getMatrix() + this->getActualCols() * i,
-                                             this->getCols() * sizeof(T),
-                                             cudaMemcpyDeviceToHost));
-                    }
-                } else {
-                    auto castMatrix = Internal::_castMatricesOnCuda<T, Memory, Alignment, R>(*this);
-                    for (uint64_t i = 0; i < copyMatrix.getRows(); i++) {
-                        gpuErrchk(cudaMemcpy(copyMatrix.getMatrix() + copyMatrix.getActualCols() * i,
-                                             castMatrix.getMatrix() + castMatrix.getActualCols() * i,
-                                             castMatrix.getCols() * sizeof(R),
-                                             cudaMemcpyDeviceToHost));
-                    }
-                }
-            }
+        else if constexpr(Internal::is_matrix_derived_from_device<T, Memory, Padding>
+                          && Internal::is_matrix_derived_from_paged_or_pinned<T, rMemory, rPadding>) {
+            return Internal::_copyDeviceToHost<T, Memory, Padding, rMemory, rPadding, R>((Matrix<T, Memory, Padding> &)(*this));
         } // device to device
-        else if constexpr(Internal::is_matrix_derived_from_device<T, Memory, Alignment>
-                          && Internal::is_matrix_derived_from_device<T, rMemory, rAlignment>) {
+        else if constexpr(Internal::is_matrix_derived_from_device<T, Memory, Padding>
+                          && Internal::is_matrix_derived_from_device<T, rMemory, rPadding>) {
             //Internal::testAgain<T>(100);
-            return Internal::_copyDeviceToDevice<T, Memory, Alignment, rMemory, rAlignment, R>((Matrix<T, Memory, Alignment> &)(*this));
+            return Internal::_copyDeviceToDevice<T, Memory, Padding, rMemory, rPadding, R>((Matrix<T, Memory, Padding> &)(*this));
         }
 
         return copyMatrix;
@@ -206,20 +152,20 @@ namespace NaNL {
 
 
 
-    template<class T, template<class, class> class Memory, class Alignment>
-    template<template<class, class> class rMemory, class rAlignment>
-    Matrix<T, rMemory, rAlignment> NaNL::Matrix<T, Memory, Alignment>::moveTo() const && {
+    template<class T, template<class, class> class Memory, class Padding>
+    template<template<class, class> class rMemory, class rPadding>
+    Matrix<T, rMemory, rPadding> NaNL::Matrix<T, Memory, Padding>::moveTo() const && {
         std::shared_lock<std::shared_mutex> lock(this->_shared_mutex);
 
         // if moving to the same thing, just return.
-        if constexpr(std::is_base_of_v<Matrix<T, Memory, Alignment>, Matrix<T, rMemory, rAlignment>>) {
-            if constexpr (Internal::is_matrix_derived_from_device<T, Memory, Alignment>
-                    && Internal::is_matrix_derived_from_device<T, rMemory, rAlignment>) {
+        if constexpr(std::is_base_of_v<Matrix<T, Memory, Padding>, Matrix<T, rMemory, rPadding>>) {
+            if constexpr (Internal::is_matrix_derived_from_device<T, Memory, Padding>
+                    && Internal::is_matrix_derived_from_device<T, rMemory, rPadding>) {
                 // check if they exist on same device.
                 int currentDevice;
                 gpuErrchk(cudaGetDevice(&currentDevice));
                 if(this->getCudaDevice() != currentDevice) {
-                    Matrix<T, rMemory, rAlignment> movedMatrix(this->getRows(), this->getCols());
+                    Matrix<T, rMemory, rPadding> movedMatrix(this->getRows(), this->getCols());
                     if(this->getActualRows() == movedMatrix.getActualRows()
                        && this->getActualCols() == movedMatrix.getActualCols()) {
                         cudaMemcpyPeer(movedMatrix.getMatrix(), movedMatrix.getCudaDevice(), this->getMatrix(), this->getCudaDevice(), sizeof(T) * this->getActualTotalSize());
@@ -241,9 +187,9 @@ namespace NaNL {
 
         // If this is Matrix is stored on host memory, and if the desired Matrix
         // is also stored on host memory.
-        else if constexpr(NaNL::Internal::is_matrix_derived_from_paged_or_pinned<T, Memory, Alignment>
-                && NaNL::Internal::is_matrix_derived_from_paged_or_pinned<T, rMemory, rAlignment>) {
-            Matrix<T, rMemory, rAlignment> movedMatrix(this->getRows(), this->getCols());
+        else if constexpr(NaNL::Internal::is_matrix_derived_from_paged_or_pinned<T, Memory, Padding>
+                && NaNL::Internal::is_matrix_derived_from_paged_or_pinned<T, rMemory, rPadding>) {
+            Matrix<T, rMemory, rPadding> movedMatrix(this->getRows(), this->getCols());
             for(uint64_t i = 0; i < this->getRows(); i++) {
                 for(uint64_t j = 0; j < this->getCols(); j++) {
                     movedMatrix[i][j] = this->get(i,j);
@@ -253,9 +199,9 @@ namespace NaNL {
             return movedMatrix;
         }
         // Matrix is from Host to Device
-        else if constexpr(Internal::is_matrix_derived_from_paged_or_pinned<T, Memory, Alignment>
-                && Internal::is_matrix_derived_from_device<T, rMemory, rAlignment>){
-            Matrix<T, rMemory, rAlignment> movedMatrix(this->getRows(), this->getCols());
+        else if constexpr(Internal::is_matrix_derived_from_paged_or_pinned<T, Memory, Padding>
+                && Internal::is_matrix_derived_from_device<T, rMemory, rPadding>){
+            Matrix<T, rMemory, rPadding> movedMatrix(this->getRows(), this->getCols());
             if(this->getActualRows() == movedMatrix.getActualRows()
                 && this->getActualCols() == movedMatrix.getActualCols()) {
                 cudaMemcpy(movedMatrix.getMatrix(), this->getMatrix(), sizeof(T) * this->getActualTotalSize(), cudaMemcpyHostToDevice);
@@ -268,9 +214,9 @@ namespace NaNL {
             return movedMatrix;
         }
         // Matrix is from Device to Host
-        else if constexpr(Internal::is_matrix_derived_from_device<T, Memory, Alignment>
-                && Internal::is_matrix_derived_from_paged_or_pinned<T, rMemory, rAlignment>) {
-            Matrix<T, rMemory, rAlignment> movedMatrix(this->getRows(), this->getCols());
+        else if constexpr(Internal::is_matrix_derived_from_device<T, Memory, Padding>
+                && Internal::is_matrix_derived_from_paged_or_pinned<T, rMemory, rPadding>) {
+            Matrix<T, rMemory, rPadding> movedMatrix(this->getRows(), this->getCols());
             if(this->getActualRows() == movedMatrix.getActualRows()
                && this->getActualCols() == movedMatrix.getActualCols()) {
                 cudaMemcpy(movedMatrix.getMatrix(), this->getMatrix(), sizeof(T) * this->getActualTotalSize(), cudaMemcpyDeviceToHost);
@@ -288,119 +234,121 @@ namespace NaNL {
         }
     }
 
-    template<class T, template<class, class> class Memory, class Alignment>
-    template<template<class, class> class rMemory, class rAlignment,
-            template<class, class> class uMemory, class uAlignment>
-    Matrix<T, rMemory, rAlignment>
-    Matrix<T, Memory, Alignment>::add(const Matrix<T, uMemory, uAlignment> &b, MatrixAddOperation device) {
+    template<class T, template<class, class> class Memory, class Padding>
+    template<template<class, class> class rMemory, class rPadding,
+            template<class, class> class uMemory, class uPadding>
+    Matrix<T, rMemory, rPadding>
+    Matrix<T, Memory, Padding>::add(const Matrix<T, uMemory, uPadding> &b, MatrixAddOperation device) {
         std::shared_lock<std::shared_mutex> aLock(this->getMutex());
         std::shared_lock<std::shared_mutex> bLock(b.getMutex());
 
         if (MatrixAddOperation::TensorCores == device) {
 
         } else if (MatrixAddOperation::Cuda == device) {
-            return addCuda<rMemory, rAlignment, uMemory, uAlignment>((const Matrix<T, Memory, Alignment> &) (*this), b);
+            return addCuda<rMemory, rPadding, uMemory, uPadding>((const Matrix<T, Memory, Padding> &) (*this), b);
         } else /*Host*/ {
-            //return addHost<T, rMemory, rAlignment>((const Matrix<T, Memory, Alignment> &) (*this), b);
-            return addHost<rMemory, rAlignment, uMemory, uAlignment>((const Matrix<T, Memory, Alignment> &) (*this), b);
+            //return addHost<T, rMemory, rPadding>((const Matrix<T, Memory, Padding> &) (*this), b);
+            return addHost<rMemory, rPadding, uMemory, uPadding>((const Matrix<T, Memory, Padding> &) (*this), b);
         }
     }
 
-    template<class T, template<class, class> class Memory, class Alignment>
-    template<template<class, class> class rMemory, class rAlignment,
-            template<class, class> class uMemory, class uAlignment>
-    Matrix<T, rMemory, rAlignment> Matrix<T, Memory, Alignment>::addHost(const Matrix<T, Memory, Alignment> &a,
-                                                          const Matrix<T, uMemory, uAlignment> &b) {
+    template<class T, template<class, class> class Memory, class Padding>
+    template<template<class, class> class rMemory, class rPadding,
+            template<class, class> class uMemory, class uPadding>
+    Matrix<T, rMemory, rPadding> Matrix<T, Memory, Padding>::addHost(const Matrix<T, Memory, Padding> &a,
+                                                          const Matrix<T, uMemory, uPadding> &b) {
 //        if (!a.validateMatricesAreSameShape(b)) {
 //            // TODO: throw exception eventually
 //            //throw a.MatrixIsInvalidShape("");
 //        }
 
-        // Since C is to be calculated on host, define as paged memory with return alignment.
-        Matrix<T, PagedMemoryBlock, rAlignment> c(a.getRows(), a.getCols());
+        // Since C is to be calculated on host, define as paged memory with return Padding.
+        Matrix<T, PagedMemoryBlock, rPadding> c(a.getRows(), a.getCols());
 
         // a & b are both derived from HostMemoryBlock
-        if constexpr(IsDerivedFromHostMemoryBlock<T, Memory, Alignment>
-                && IsDerivedFromHostMemoryBlock<T, uMemory, uAlignment>) {
+        if constexpr(IsDerivedFromHostMemoryBlock<T, Memory, Padding>
+                && IsDerivedFromHostMemoryBlock<T, uMemory, uPadding>) {
             Internal::_addMatricesOnHost(a, b, c);
         }
 
         // Only a is derived from HostMemoryBlock
-        else if constexpr(IsDerivedFromHostMemoryBlock<T, Memory, Alignment>
-                && !IsDerivedFromHostMemoryBlock<T, uMemory, uAlignment>) {
-            Internal::_addMatricesOnHost(a, b.template copyTo<PagedMemoryBlock, uAlignment>(), c);
+        else if constexpr(IsDerivedFromHostMemoryBlock<T, Memory, Padding>
+                && !IsDerivedFromHostMemoryBlock<T, uMemory, uPadding>) {
+            Internal::_addMatricesOnHost(a, b.template copyTo<PagedMemoryBlock, uPadding>(), c);
         }
 
         // Only b is derived from HostMemoryBlock
-        else if constexpr(!IsDerivedFromHostMemoryBlock<T, Memory, Alignment>
-                && IsDerivedFromHostMemoryBlock<T, uMemory, uAlignment>) {
-            Internal::_addMatricesOnHost(a.template copyTo<PagedMemoryBlock, Alignment>(), b, c);
+        else if constexpr(!IsDerivedFromHostMemoryBlock<T, Memory, Padding>
+                && IsDerivedFromHostMemoryBlock<T, uMemory, uPadding>) {
+            Internal::_addMatricesOnHost(a.template copyTo<PagedMemoryBlock, Padding>(), b, c);
         }
 
         // Neither a or b derived from HostMemoryBlock
         else {
-            Internal::_addMatricesOnHost(a.template copyTo<PagedMemoryBlock, Alignment>(),
-                                         b.template copyTo<PagedMemoryBlock, uAlignment>(), c);
+            Internal::_addMatricesOnHost(a.template copyTo<PagedMemoryBlock, Padding>(),
+                                         b.template copyTo<PagedMemoryBlock, uPadding>(), c);
         }
 
         // TODO: move c to requested
-        return std::move(c).template moveTo<rMemory, rAlignment>();
+        return std::move(c).template moveTo<rMemory, rPadding>();
     }
 
-    template<class T, template<class, class> class Memory, class Alignment>
-    template<template<class, class> class rMemory, class rAlignment,
-            template<class, class> class uMemory, class uAlignment>
-    Matrix<T, rMemory, rAlignment> Matrix<T, Memory, Alignment>::addCuda(const Matrix<T, Memory, Alignment> &a,
-                                                                         const Matrix<T, uMemory, uAlignment> &b) {
+    template<class T, template<class, class> class Memory, class Padding>
+    template<template<class, class> class rMemory, class rPadding,
+            template<class, class> class uMemory, class uPadding>
+    Matrix<T, rMemory, rPadding> Matrix<T, Memory, Padding>::addCuda(const Matrix<T, Memory, Padding> &a,
+                                                                         const Matrix<T, uMemory, uPadding> &b) {
 //        if (!a.validateMatricesAreSameShape(b)) {
 //            // TODO: throw exception eventually
 //            //throw a.MatrixIsInvalidShape("");
 //        }
 
-        // Since C is to be calculated on host, define as paged memory with return alignment.
-        std::unique_ptr<Matrix<T, DeviceMemoryBlock, rAlignment>> aDevicePtr;
-        std::unique_ptr<Matrix<T, DeviceMemoryBlock, rAlignment>> bDevicePtr;
+        // Since C is to be calculated on host, define as paged memory with return Padding.
+        std::unique_ptr<Matrix<T, DeviceMemoryBlock, rPadding>> aDevicePtr;
+        std::unique_ptr<Matrix<T, DeviceMemoryBlock, rPadding>> bDevicePtr;
 
 
-        Matrix<T, DeviceMemoryBlock, rAlignment> c(a.getRows(), a.getCols());
+        Matrix<T, DeviceMemoryBlock, rPadding> c(a.getRows(), a.getCols());
 
         // a & b are both derived from HostMemoryBlock
-        if constexpr(IsDerivedFromDeviceMemoryBlock<T, Memory, Alignment>
-                     && IsDerivedFromDeviceMemoryBlock<T, uMemory, uAlignment>) {
+        if constexpr(IsDerivedFromDeviceMemoryBlock<T, Memory, Padding>
+                     && IsDerivedFromDeviceMemoryBlock<T, uMemory, uPadding>) {
             Internal::_addMatricesOnCuda(a, b, c);
+            //Internal::_addMatricesOnCuda(a, b, c);
         }
 
         // Only a is derived from HostMemoryBlock
-        else if constexpr(IsDerivedFromDeviceMemoryBlock<T, Memory, Alignment>
-                          && !IsDerivedFromDeviceMemoryBlock<T, uMemory, uAlignment>) {
-            Internal::_addMatricesOnCuda(a, b.template copyTo<DeviceMemoryBlock, uAlignment>(), c);
+        else if constexpr(IsDerivedFromDeviceMemoryBlock<T, Memory, Padding>
+                          && !IsDerivedFromDeviceMemoryBlock<T, uMemory, uPadding>) {
+            Internal::_addMatricesOnCuda(a, b.template copyTo<DeviceMemoryBlock, uPadding>(), c);
         }
 
         // Only b is derived from HostMemoryBlock
-        else if constexpr(!IsDerivedFromDeviceMemoryBlock<T, Memory, Alignment>
-                          && IsDerivedFromDeviceMemoryBlock<T, uMemory, uAlignment>) {
-            Internal::_addMatricesOnCuda(a.template copyTo<DeviceMemoryBlock, Alignment>(), b, c);
+        else if constexpr(!IsDerivedFromDeviceMemoryBlock<T, Memory, Padding>
+                          && IsDerivedFromDeviceMemoryBlock<T, uMemory, uPadding>) {
+            Internal::_addMatricesOnCuda(a.template copyTo<DeviceMemoryBlock, Padding>(), b, c);
         }
 
         // Neither a or b derived from HostMemoryBlock
-        else {
-            Internal::_addMatricesOnCuda(a.template copyTo<DeviceMemoryBlock, Alignment>(),
-                                         b.template copyTo<DeviceMemoryBlock, uAlignment>(), c);
+        else if constexpr (!IsDerivedFromDeviceMemoryBlock<T, Memory, Padding> &&
+                !IsDerivedFromDeviceMemoryBlock<T, uMemory, uPadding>){
+            Internal::_addMatricesOnCuda(a.template copyTo<DeviceMemoryBlock, Padding>(),
+                                         b.template copyTo<DeviceMemoryBlock, uPadding>(), c);
         }
 
         // TODO: move c to requested
-        return std::move(c).template moveTo<rMemory, rAlignment>();
+        return std::move(c).template moveTo<rMemory, rPadding>();
     }
-//    template<class T, template<class, class> class Memory, class Alignment>
-//    template<template<class, class> class uMemory, class uAlignment,
-//        template<class, class> class rMemory, class rAlignment>
-//    Matrix<T, rMemory, rAlignment> Matrix<T, Memory, Alignment>::addCuda(const Matrix<T, Memory, Alignment> &a, const Matrix<T, uMemory, uAlignment> &b) {
+//    template<class T, template<class, class> class Memory, class Padding>
+//    template<template<class, class> class uMemory, class uPadding,
+//        template<class, class> class rMemory, class rPadding>
+//    Matrix<T, rMemory, rPadding> Matrix<T, Memory, Padding>::addCuda(const Matrix<T, Memory, Padding> &a, const Matrix<T, uMemory, uPadding> &b) {
 //        if (!a.validateMatricesAreSameShape(b)) {
 //            // TODO: throw exception eventually
 //            //throw a.MatrixIsInvalidShape("");
 //        }
 //
-//        return Matrix<T, rMemory, rAlignment>();
+//        return Matrix<T, rMemory, rPadding>();
 //    }
 }
 

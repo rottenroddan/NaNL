@@ -22,12 +22,6 @@ TEST_F(MatrixHostAddSuite, Should_Add_Small_Matrices_To_Correct_Values_When_Devi
 
         auto c = a.add<NaNL::DeviceMemoryBlock, NaNL::TensorCoreAligned32>(b, NaNL::MatrixAddOperation::Host);
 
-        auto endTime = std::chrono::high_resolution_clock::now();
-        auto elapsedTimeMicro = std::chrono::duration_cast<std::chrono::microseconds>(endTime-startTime).count();
-        auto elapsedTimeSeconds = std::chrono::duration_cast<std::chrono::milliseconds>(endTime-startTime).count();
-
-        std::cout << "HostAdd time: " << std::setw(9) << std::right << elapsedTimeMicro << "μs. ("<< std::left << std::fixed << std::setw(7)  << elapsedTimeSeconds / 1000.0 << "s. )"<< std::endl;
-
         ASSERT_EQ(c.getRows(), truth.getRows());
         ASSERT_EQ(c.getCols(), truth.getCols());
 
@@ -52,24 +46,12 @@ TEST_F(MatrixHostAddSuite, Should_Add_Medium_Matrices_To_Correct_Values_When_Dev
         auto b = mediumTestMatrices->getCopyOfB<NaNL::DeviceMemoryBlock, NaNL::TensorCoreAligned32>().copyTo<NaNL::DeviceMemoryBlock, NaNL::TensorCoreAligned32, float>();
         auto truth = mediumTestMatrices->getCopyOfTruth<NaNL::PagedMemoryBlock, NaNL::TensorCoreAligned32>();
 
-        std::cout << "A: " << a.copyTo<NaNL::PagedMemoryBlock, NaNL::Unaligned>()[1326][1088] << std::endl;
-        std::cout << "B: " << b.copyTo<NaNL::PagedMemoryBlock, NaNL::Unaligned>()[1326][1088] << std::endl;
-        std::cout << "C: " << truth[1326][1088] << std::endl;
-
-        auto startTime = std::chrono::high_resolution_clock::now();
-
         auto c = a.add<NaNL::DeviceMemoryBlock, NaNL::TensorCoreAligned32>(b, NaNL::MatrixAddOperation::Host);
 
         ASSERT_EQ(c.getRows(), truth.getRows());
         ASSERT_EQ(c.getCols(), truth.getCols());
 
         auto hostC = c.copyTo<NaNL::PagedMemoryBlock, NaNL::TensorCoreAligned32>();
-
-        auto endTime = std::chrono::high_resolution_clock::now();
-        auto elapsedTimeMicro = std::chrono::duration_cast<std::chrono::microseconds>(endTime-startTime).count();
-        auto elapsedTimeSeconds = std::chrono::duration_cast<std::chrono::milliseconds>(endTime-startTime).count();
-
-        std::cout << "HostAdd time: " << std::setw(9) << std::right << elapsedTimeMicro << "μs. ("<< std::left << std::fixed << std::setw(7)  << elapsedTimeSeconds / 1000.0 << "s. )"<< std::endl;
 
         // validations must be done on host. operator[] doesn't exist on
         // Matrix<.,DeviceMemoryBlock,.>...
@@ -93,12 +75,6 @@ TEST_F(MatrixHostAddSuite, Should_Add_Large_Matrices_To_Correct_Values_When_Devi
         auto startTime = std::chrono::high_resolution_clock::now();
 
         auto c = a.add<NaNL::DeviceMemoryBlock, NaNL::TensorCoreAligned32>(b);
-
-        auto endTime = std::chrono::high_resolution_clock::now();
-        auto elapsedTimeMicro = std::chrono::duration_cast<std::chrono::microseconds>(endTime-startTime).count();
-        auto elapsedTimeSeconds = std::chrono::duration_cast<std::chrono::milliseconds>(endTime-startTime).count();
-
-        std::cout << "HostAdd time: " << std::setw(9) << std::right << elapsedTimeMicro << "μs. ("<< std::left << std::fixed << std::setw(7)  << elapsedTimeSeconds / 1000.0 << "s. )"<< std::endl;
 
         ASSERT_EQ(c.getRows(), truth.getRows());
         ASSERT_EQ(c.getCols(), truth.getCols());

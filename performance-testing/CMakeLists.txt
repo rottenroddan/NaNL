@@ -5,7 +5,7 @@ project(Performance-Testing LANGUAGES CUDA CXX)
 find_package(CUDA REQUIRED)
 include_directories(${CUDA_INCLUDE_DIRS})
 
-add_executable(Performance-Testing  main.cu)
+add_executable(Performance-Testing  MatrixAdditionPerfTests/MatrixAdditionPerfTest.cu main.cu)
 target_link_libraries(Performance-Testing PUBLIC Matrix)
 
 #set(CMAKE_VERBOSE_MAKEFILE ON)
@@ -15,16 +15,15 @@ target_link_libraries(Performance-Testing PUBLIC Matrix)
 #set(CMAKE_CUDA_STANDARD 20)
 #set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 
-
 #set_target_properties(Matrix PROPERTIES LINKER_LANGUAGE CXX)
 #set_target_properties(Performance-Testing PROPERTIES LINKER_LANGUAGE CXX)
 
 add_compile_definitions(PERFORMANCE_LOGGING)
 
-add_custom_command(
-        TARGET Performance-Testing PRE_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_CURRENT_SOURCE_DIR}/data/
-        ${PROJECT_BINARY_DIR}/data/
-)
+#add_custom_command(
+#        TARGET Performance-Testing PRE_BUILD
+#        COMMAND ${CMAKE_COMMAND} -E copy_directory
+#        ${CMAKE_CURRENT_SOURCE_DIR}/data/
+#        ${PROJECT_BINARY_DIR}/data/
+#)
 
